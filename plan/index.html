@@ -1,0 +1,228 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plan Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f4f4;
+        padding: 40px;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: auto;
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      .wrapper {
+        display: flex;
+        gap: 40px;
+        position: relative;
+      }
+
+      .wrapper::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        border-left: 1px solid #e2e2e2;
+      }
+
+      .left,
+      .right {
+        flex: 1;
+        padding: 0 20px;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+      }
+
+      .label {
+        font-weight: 600;
+        margin-top: 25px;
+      }
+
+      .value-box {
+        float: right;
+        background: #f5eef2;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #c02c7c;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #c02c7c;
+        margin-top: 10px;
+      }
+
+      .summary {
+        text-align: center;
+      }
+
+      .big-amount {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 10px 0 20px;
+      }
+
+      .summary-box {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .yellow {
+        color: #e3b23c;
+        font-weight: bold;
+      }
+      .pink {
+        color: #c02c7c;
+        font-weight: bold;
+      }
+
+      canvas {
+        max-width: 320px;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="wrapper">
+        <div class="left">
+          <h2>Investment Plan Calculator</h2>
+
+          <div class="label">
+            Monthly Investment
+            <span class="value-box" id="investmentVal">₹ 10,000</span>
+          </div>
+          <input
+            type="range"
+            id="investment"
+            min="1000"
+            max="100000"
+            step="1000"
+            value="10000"
+          />
+
+          <div class="label">
+            Expected Return (%)
+            <span class="value-box" id="returnVal">12%</span>
+          </div>
+          <input type="range" id="returnRate" min="5" max="20" value="12" />
+
+          <div class="label">
+            Investment Duration (Years)
+            <span class="value-box" id="yearsVal">10</span>
+          </div>
+          <input type="range" id="years" min="1" max="30" value="10" />
+        </div>
+
+        <div class="right">
+          <div class="summary">
+            <div>Maturity Value</div>
+            <div class="big-amount" id="maturityValue">₹ 23,23,391</div>
+
+            <canvas id="chart"></canvas>
+
+            <div class="summary-box">
+              <span>Total Invested</span>
+              <span class="yellow" id="totalInvested">₹ 12,00,000</span>
+            </div>
+
+            <div class="summary-box">
+              <span>Total Returns</span>
+              <span class="pink" id="totalReturns">₹ 11,23,391</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const investmentInput = document.getElementById("investment");
+      const returnInput = document.getElementById("returnRate");
+      const yearsInput = document.getElementById("years");
+
+      function format(num) {
+        return num.toLocaleString("en-IN");
+      }
+
+      function calculate() {
+        const monthlyInvestment = parseFloat(investmentInput.value);
+        const annualReturn = parseFloat(returnInput.value) / 100;
+        const years = parseInt(yearsInput.value);
+
+        const months = years * 12;
+        const monthlyRate = annualReturn / 12;
+
+        const maturity =
+          monthlyInvestment *
+          ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+
+        const totalInvested = monthlyInvestment * months;
+        const totalReturns = maturity - totalInvested;
+
+        document.getElementById("investmentVal").innerText =
+          "₹ " + format(monthlyInvestment);
+
+        document.getElementById("returnVal").innerText =
+          returnInput.value + "%";
+
+        document.getElementById("yearsVal").innerText = years;
+
+        document.getElementById("maturityValue").innerText =
+          "₹ " + format(Math.round(maturity));
+
+        document.getElementById("totalInvested").innerText =
+          "₹ " + format(totalInvested);
+
+        document.getElementById("totalReturns").innerText =
+          "₹ " + format(Math.round(totalReturns));
+
+        chart.data.datasets[0].data = [totalInvested, Math.round(totalReturns)];
+        chart.update();
+      }
+
+      const ctx = document.getElementById("chart");
+
+      const chart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Total Invested", "Total Returns"],
+          datasets: [
+            {
+              data: [1200000, 1123391],
+              backgroundColor: ["#e3b23c", "#c02c7c"],
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { position: "top" } },
+          cutout: "65%",
+        },
+      });
+
+      [investmentInput, returnInput, yearsInput].forEach((el) =>
+        el.addEventListener("input", calculate),
+      );
+
+      calculate();
+    </script>
+  </body>
+</html>

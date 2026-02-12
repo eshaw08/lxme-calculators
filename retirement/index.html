@@ -1,0 +1,287 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Retirement Planning Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f4f4;
+        padding: 40px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: auto;
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      .wrapper {
+        display: flex;
+        gap: 40px;
+        position: relative;
+      }
+
+      .wrapper::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        border-left: 1px solid #e2e2e2;
+      }
+
+      .left,
+      .right {
+        flex: 1;
+        padding: 0 20px;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+      }
+
+      .label {
+        font-weight: 600;
+        margin-top: 20px;
+      }
+
+      .value-box {
+        float: right;
+        background: #f5eef2;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #c02c7c;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #c02c7c;
+        margin-top: 10px;
+      }
+
+      .range-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: #777;
+      }
+
+      .summary {
+        text-align: center;
+      }
+
+      .big-amount {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 10px 0 20px;
+      }
+
+      .summary-box {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .yellow {
+        color: #e3b23c;
+        font-weight: bold;
+      }
+      .pink {
+        color: #c02c7c;
+        font-weight: bold;
+      }
+
+      canvas {
+        max-width: 300px;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="wrapper">
+        <div class="left">
+          <h2>Retirement Planning Calculator</h2>
+
+          <div class="label">
+            Current Age
+            <span class="value-box" id="currentAgeVal">30</span>
+          </div>
+          <input type="range" id="currentAge" min="18" max="60" value="30" />
+
+          <div class="label">
+            Retirement Age
+            <span class="value-box" id="retireAgeVal">60</span>
+          </div>
+          <input type="range" id="retireAge" min="40" max="70" value="60" />
+
+          <div class="label">
+            Monthly Expenses Today
+            <span class="value-box" id="expenseVal">₹ 50,000</span>
+          </div>
+          <input
+            type="range"
+            id="expense"
+            min="10000"
+            max="200000"
+            step="1000"
+            value="50000"
+          />
+
+          <div class="label">
+            Expected Inflation (%)
+            <span class="value-box" id="inflationVal">6%</span>
+          </div>
+          <input type="range" id="inflation" min="1" max="12" value="6" />
+
+          <div class="label">
+            Expected Return (%)
+            <span class="value-box" id="returnVal">12%</span>
+          </div>
+          <input type="range" id="returnRate" min="5" max="20" value="12" />
+
+          <div class="label">
+            Existing Savings
+            <span class="value-box" id="savingsVal">₹ 5,00,000</span>
+          </div>
+          <input
+            type="range"
+            id="savings"
+            min="0"
+            max="5000000"
+            step="50000"
+            value="500000"
+          />
+        </div>
+
+        <div class="right">
+          <div class="summary">
+            <div>Required Retirement Corpus</div>
+            <div class="big-amount" id="corpusDisplay">₹ 3,72,15,000</div>
+
+            <canvas id="chart"></canvas>
+
+            <div class="summary-box">
+              <span>Future Monthly Expense</span>
+              <span class="yellow" id="futureExpense">₹ 2,87,000</span>
+            </div>
+
+            <div class="summary-box">
+              <span>Required Monthly SIP</span>
+              <span class="pink" id="sipDisplay">₹ 22,500</span>
+            </div>
+
+            <div class="summary-box">
+              <span>Existing Savings</span>
+              <span class="yellow" id="existingDisplay">₹ 5,00,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const currentAge = document.getElementById("currentAge");
+      const retireAge = document.getElementById("retireAge");
+      const expense = document.getElementById("expense");
+      const inflation = document.getElementById("inflation");
+      const returnRate = document.getElementById("returnRate");
+      const savings = document.getElementById("savings");
+
+      function format(num) {
+        return num.toLocaleString("en-IN");
+      }
+
+      function calculate() {
+        const ageNow = parseInt(currentAge.value);
+        const ageRetire = parseInt(retireAge.value);
+        const monthlyExpense = parseFloat(expense.value);
+        const inflationRate = parseFloat(inflation.value) / 100;
+        const returnR = parseFloat(returnRate.value) / 100;
+        const existingSavings = parseFloat(savings.value);
+
+        const years = ageRetire - ageNow;
+
+        if (years <= 0) return;
+
+        const futureExpense =
+          monthlyExpense * Math.pow(1 + inflationRate, years);
+        const annualExpense = futureExpense * 12;
+
+        // 4% withdrawal rule
+        const corpus = annualExpense * 25;
+
+        const months = years * 12;
+        const monthlyRate = returnR / 12;
+
+        const sip =
+          ((corpus - existingSavings) * monthlyRate) /
+          (Math.pow(1 + monthlyRate, months) - 1);
+
+        document.getElementById("currentAgeVal").innerText = ageNow;
+        document.getElementById("retireAgeVal").innerText = ageRetire;
+        document.getElementById("expenseVal").innerText =
+          "₹ " + format(monthlyExpense);
+        document.getElementById("inflationVal").innerText =
+          inflation.value + "%";
+        document.getElementById("returnVal").innerText = returnRate.value + "%";
+        document.getElementById("savingsVal").innerText =
+          "₹ " + format(existingSavings);
+
+        document.getElementById("futureExpense").innerText =
+          "₹ " + format(Math.round(futureExpense));
+
+        document.getElementById("corpusDisplay").innerText =
+          "₹ " + format(Math.round(corpus));
+
+        document.getElementById("sipDisplay").innerText =
+          "₹ " + format(Math.round(sip > 0 ? sip : 0));
+
+        document.getElementById("existingDisplay").innerText =
+          "₹ " + format(existingSavings);
+
+        chart.data.datasets[0].data = [
+          existingSavings,
+          Math.max(corpus - existingSavings, 0),
+        ];
+        chart.update();
+      }
+
+      const ctx = document.getElementById("chart");
+
+      const chart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Existing Savings", "Additional Required"],
+          datasets: [
+            {
+              data: [500000, 1000000],
+              backgroundColor: ["#e3b23c", "#c02c7c"],
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { position: "top" } },
+          cutout: "65%",
+        },
+      });
+
+      [currentAge, retireAge, expense, inflation, returnRate, savings].forEach(
+        (el) => el.addEventListener("input", calculate),
+      );
+
+      calculate();
+    </script>
+  </body>
+</html>

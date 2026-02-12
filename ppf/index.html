@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PPF Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f4f4;
+        padding: 40px;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: auto;
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      .wrapper {
+        display: flex;
+        gap: 40px;
+        position: relative;
+      }
+
+      .wrapper::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        border-left: 1px solid #e2e2e2;
+      }
+
+      .left,
+      .right {
+        flex: 1;
+        padding: 0 20px;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+      }
+
+      .label {
+        font-weight: 600;
+        margin-top: 25px;
+      }
+
+      .value-box {
+        float: right;
+        background: #f5eef2;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #c02c7c;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #c02c7c;
+        margin-top: 10px;
+      }
+
+      .summary {
+        text-align: center;
+      }
+
+      .big-amount {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 10px 0 20px;
+      }
+
+      .summary-box {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .yellow {
+        color: #e3b23c;
+        font-weight: bold;
+      }
+      .pink {
+        color: #c02c7c;
+        font-weight: bold;
+      }
+
+      canvas {
+        max-width: 320px;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="wrapper">
+        <div class="left">
+          <h2>PPF Calculator</h2>
+
+          <div class="label">
+            Yearly Investment
+            <span class="value-box" id="investmentVal">₹ 1,00,000</span>
+          </div>
+          <input
+            type="range"
+            id="investment"
+            min="500"
+            max="150000"
+            step="500"
+            value="100000"
+          />
+
+          <div class="label">
+            Interest Rate (%)
+            <span class="value-box" id="rateVal">7.1%</span>
+          </div>
+          <input
+            type="range"
+            id="rate"
+            min="1"
+            max="12"
+            step="0.1"
+            value="7.1"
+          />
+
+          <div class="label">
+            Investment Period (Years)
+            <span class="value-box" id="yearsVal">15</span>
+          </div>
+          <input type="range" id="years" min="15" max="30" value="15" />
+        </div>
+
+        <div class="right">
+          <div class="summary">
+            <div>Maturity Amount</div>
+            <div class="big-amount" id="maturity">₹ 27,12,139</div>
+
+            <canvas id="chart"></canvas>
+
+            <div class="summary-box">
+              <span>Total Invested</span>
+              <span class="yellow" id="invested">₹ 15,00,000</span>
+            </div>
+
+            <div class="summary-box">
+              <span>Total Interest Earned</span>
+              <span class="pink" id="interest">₹ 12,12,139</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const investmentInput = document.getElementById("investment");
+      const rateInput = document.getElementById("rate");
+      const yearsInput = document.getElementById("years");
+
+      function format(num) {
+        return num.toLocaleString("en-IN");
+      }
+
+      function calculate() {
+        const P = parseFloat(investmentInput.value);
+        const r = parseFloat(rateInput.value) / 100;
+        const n = parseInt(yearsInput.value);
+
+        // PPF formula (start of year investment)
+        const maturity = P * (((Math.pow(1 + r, n) - 1) / r) * (1 + r));
+        const totalInvested = P * n;
+        const interestEarned = maturity - totalInvested;
+
+        document.getElementById("investmentVal").innerText = "₹ " + format(P);
+
+        document.getElementById("rateVal").innerText = rateInput.value + "%";
+
+        document.getElementById("yearsVal").innerText = n;
+
+        document.getElementById("maturity").innerText =
+          "₹ " + format(Math.round(maturity));
+
+        document.getElementById("invested").innerText =
+          "₹ " + format(totalInvested);
+
+        document.getElementById("interest").innerText =
+          "₹ " + format(Math.round(interestEarned));
+
+        chart.data.datasets[0].data = [
+          totalInvested,
+          Math.round(interestEarned),
+        ];
+        chart.update();
+      }
+
+      const ctx = document.getElementById("chart");
+
+      const chart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Total Invested", "Total Interest"],
+          datasets: [
+            {
+              data: [1500000, 1212139],
+              backgroundColor: ["#e3b23c", "#c02c7c"],
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { position: "top" } },
+          cutout: "65%",
+        },
+      });
+
+      [investmentInput, rateInput, yearsInput].forEach((el) =>
+        el.addEventListener("input", calculate),
+      );
+
+      calculate();
+    </script>
+  </body>
+</html>

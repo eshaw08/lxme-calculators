@@ -1,0 +1,304 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Car Loan Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f4f4;
+        padding: 40px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: auto;
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      .wrapper {
+        display: flex;
+        gap: 40px;
+        position: relative;
+      }
+
+      .wrapper::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        border-left: 1px solid #e2e2e2;
+      }
+
+      .left,
+      .right {
+        flex: 1;
+        padding: 0 20px;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+      }
+
+      .info-box {
+        background: #f6f1e7;
+        padding: 12px 15px;
+        border-radius: 10px;
+        font-size: 14px;
+        margin-bottom: 25px;
+      }
+
+      .label {
+        font-weight: 600;
+        margin-top: 20px;
+      }
+
+      .value-box {
+        float: right;
+        background: #f5eef2;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #c02c7c;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #c02c7c;
+        margin-top: 10px;
+      }
+
+      .range-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: #777;
+      }
+
+      .toggle {
+        margin-top: 10px;
+      }
+
+      .toggle label {
+        margin-right: 15px;
+      }
+
+      .summary {
+        text-align: center;
+      }
+
+      .total-amount {
+        font-size: 36px;
+        font-weight: bold;
+        margin: 10px 0 20px;
+      }
+
+      .summary-box {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .yellow {
+        color: #e3b23c;
+        font-weight: bold;
+      }
+      .pink {
+        color: #c02c7c;
+        font-weight: bold;
+      }
+
+      button {
+        margin-top: 20px;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 25px;
+        background: #c02c7c;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      canvas {
+        max-width: 300px;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="wrapper">
+        <div class="left">
+          <h2>Car Loan Calculator</h2>
+
+          <div class="info-box">
+            💡 Lower interest rates reduce your total loan burden.
+          </div>
+
+          <div class="label">
+            Loan Amount
+            <span class="value-box" id="loanValue">₹ 10,00,000</span>
+          </div>
+          <input
+            type="range"
+            id="loan"
+            min="100000"
+            max="5000000"
+            step="50000"
+            value="1000000"
+          />
+          <div class="range-labels">
+            <span>₹ 1 Lakh</span>
+            <span>₹ 50 Lakh</span>
+          </div>
+
+          <div class="label">
+            Rate of Interest (p.a.)
+            <span class="value-box" id="rateValue">9%</span>
+          </div>
+          <input type="range" id="rate" min="5" max="20" step="0.1" value="9" />
+          <div class="range-labels">
+            <span>5%</span>
+            <span>20%</span>
+          </div>
+
+          <div class="label">
+            Loan Tenure
+            <span class="value-box" id="tenureValue">5 Yr</span>
+          </div>
+
+          <div class="toggle">
+            <label
+              ><input type="radio" name="tenureType" value="years" checked />
+              Years</label
+            >
+            <label
+              ><input type="radio" name="tenureType" value="months" />
+              Months</label
+            >
+          </div>
+
+          <input type="range" id="tenure" min="1" max="7" value="5" />
+          <div class="range-labels">
+            <span>1 Year</span>
+            <span>7 Years</span>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="summary">
+            <div>Total Amount</div>
+            <div class="total-amount" id="totalAmount">₹ 12,49,864</div>
+
+            <canvas id="chart"></canvas>
+
+            <div class="summary-box">
+              <span>Monthly EMI</span>
+              <span class="yellow" id="emi">₹ 20,831</span>
+            </div>
+
+            <div class="summary-box">
+              <span>Principal</span>
+              <span class="yellow" id="principal">₹ 10,00,000</span>
+            </div>
+
+            <div class="summary-box">
+              <span>Total Interest</span>
+              <span class="pink" id="interest">₹ 2,49,864</span>
+            </div>
+
+            <button>Apply Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const loanInput = document.getElementById("loan");
+      const rateInput = document.getElementById("rate");
+      const tenureInput = document.getElementById("tenure");
+
+      function format(num) {
+        return num.toLocaleString("en-IN");
+      }
+
+      function calculate() {
+        const P = parseFloat(loanInput.value);
+        const annualRate = parseFloat(rateInput.value) / 100;
+        const monthlyRate = annualRate / 12;
+
+        const type = document.querySelector(
+          'input[name="tenureType"]:checked',
+        ).value;
+        let tenure = parseFloat(tenureInput.value);
+
+        let months = type === "years" ? tenure * 12 : tenure;
+
+        const emi =
+          (P * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+          (Math.pow(1 + monthlyRate, months) - 1);
+
+        const total = emi * months;
+        const interest = total - P;
+
+        document.getElementById("loanValue").innerText = "₹ " + format(P);
+        document.getElementById("rateValue").innerText = rateInput.value + "%";
+        document.getElementById("tenureValue").innerText =
+          tenure + (type === "years" ? " Yr" : " Mo");
+
+        document.getElementById("emi").innerText =
+          "₹ " + format(Math.round(emi));
+
+        document.getElementById("principal").innerText = "₹ " + format(P);
+
+        document.getElementById("interest").innerText =
+          "₹ " + format(Math.round(interest));
+
+        document.getElementById("totalAmount").innerText =
+          "₹ " + format(Math.round(total));
+
+        chart.data.datasets[0].data = [P, Math.round(interest)];
+        chart.update();
+      }
+
+      const ctx = document.getElementById("chart");
+
+      const chart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Principal Amount", "Total Interest"],
+          datasets: [
+            {
+              data: [1000000, 249864],
+              backgroundColor: ["#e3b23c", "#c02c7c"],
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { position: "top" } },
+          cutout: "65%",
+        },
+      });
+
+      [loanInput, rateInput, tenureInput].forEach((el) =>
+        el.addEventListener("input", calculate),
+      );
+
+      document
+        .querySelectorAll('input[name="tenureType"]')
+        .forEach((r) => r.addEventListener("change", calculate));
+
+      calculate();
+    </script>
+  </body>
+</html>

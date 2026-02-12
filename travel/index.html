@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Travel Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f4f4;
+        padding: 40px;
+      }
+      .wrapper {
+        display: flex;
+        gap: 40px;
+        position: relative;
+      }
+
+      .wrapper::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 1px;
+        background: #ddd;
+      }
+      .container {
+        max-width: 1200px;
+        margin: auto;
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      h1 {
+        margin-bottom: 30px;
+      }
+
+      .wrapper {
+        display: flex;
+        gap: 40px;
+      }
+
+      .left,
+      .right {
+        flex: 1;
+      }
+
+      .label {
+        font-weight: 600;
+        margin-top: 20px;
+      }
+
+      .value-display {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 10px 0;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #c02c7c;
+      }
+
+      .toggle {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 10px;
+      }
+
+      .toggle input {
+        accent-color: #c02c7c;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 30px;
+      }
+
+      .box {
+        background: #f5f5f5;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+      }
+
+      .box h3 {
+        font-size: 14px;
+        margin-bottom: 10px;
+        color: #666;
+      }
+
+      .amount {
+        font-size: 26px;
+        font-weight: bold;
+      }
+
+      .yellow {
+        color: #e3b23c;
+      }
+      .pink {
+        color: #c02c7c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Travel Calculator</h1>
+
+      <div class="wrapper">
+        <!-- LEFT SIDE -->
+        <div class="left">
+          <div class="label">Where Are You Planning To Travel?</div>
+          <div class="value-display">Dubai</div>
+
+          <div class="label">When Do You Want To Travel?</div>
+
+          <div class="toggle">
+            <label
+              ><input type="radio" name="periodType" value="months" checked />
+              Months</label
+            >
+            <label
+              ><input type="radio" name="periodType" value="years" />
+              Years</label
+            >
+          </div>
+
+          <div class="value-display" id="timeDisplay">8 Months</div>
+          <input type="range" id="time" min="1" max="60" value="8" />
+
+          <div class="label">How Much Money Do You Need Today?</div>
+          <div class="value-display" id="costDisplay">₹ 500,000</div>
+          <input
+            type="range"
+            id="cost"
+            min="10000"
+            max="2000000"
+            step="10000"
+            value="500000"
+          />
+
+          <div class="label">Expected Rate Of Return</div>
+          <div class="value-display" id="returnDisplay">15%</div>
+          <input type="range" id="returnRate" min="1" max="25" value="15" />
+
+          <div style="margin-top: 10px; color: #666; font-size: 14px">
+            Assumed Inflation: 8%
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="right">
+          <canvas id="chart"></canvas>
+
+          <div class="summary-grid">
+            <div class="box">
+              <h3>Cost of travel now</h3>
+              <div class="amount yellow" id="nowCost">₹ 500,000</div>
+            </div>
+
+            <div class="box">
+              <h3>Cost of travel then</h3>
+              <div class="amount pink" id="futureCost">₹ 925,465</div>
+            </div>
+
+            <div class="box">
+              <h3>Required SIP</h3>
+              <div class="amount pink" id="sipAmount">₹ 4,977</div>
+            </div>
+
+            <div class="box">
+              <h3>Required Lumpsum</h3>
+              <div class="amount yellow" id="lumpAmount">₹ 302,536</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const inflation = 0.08;
+
+      const timeInput = document.getElementById("time");
+      const costInput = document.getElementById("cost");
+      const returnInput = document.getElementById("returnRate");
+
+      const timeDisplay = document.getElementById("timeDisplay");
+      const costDisplay = document.getElementById("costDisplay");
+      const returnDisplay = document.getElementById("returnDisplay");
+
+      const nowCost = document.getElementById("nowCost");
+      const futureCost = document.getElementById("futureCost");
+      const sipAmount = document.getElementById("sipAmount");
+      const lumpAmount = document.getElementById("lumpAmount");
+
+      function format(num) {
+        return num.toLocaleString("en-IN");
+      }
+
+      function calculate() {
+        const P = parseFloat(costInput.value);
+        const r = parseFloat(returnInput.value) / 100;
+
+        let time = parseFloat(timeInput.value);
+        const type = document.querySelector(
+          'input[name="periodType"]:checked',
+        ).value;
+
+        let years = type === "months" ? time / 12 : time;
+
+        // Future cost with inflation
+        const future = P * Math.pow(1 + inflation, years);
+
+        // SIP calculation
+        const monthlyRate = r / 12;
+        const months = years * 12;
+
+        const sip =
+          (future * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
+
+        // Lumpsum
+        const lump = future / Math.pow(1 + r, years);
+
+        timeDisplay.innerText =
+          time + (type === "months" ? " Months" : " Years");
+        costDisplay.innerText = "₹ " + format(P);
+        returnDisplay.innerText = returnInput.value + "%";
+
+        nowCost.innerText = "₹ " + format(P);
+        futureCost.innerText = "₹ " + format(Math.round(future));
+        sipAmount.innerText = "₹ " + format(Math.round(sip));
+        lumpAmount.innerText = "₹ " + format(Math.round(lump));
+
+        chart.data.datasets[0].data = [P, Math.round(future)];
+        chart.update();
+      }
+
+      const ctx = document.getElementById("chart");
+
+      const chart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Cost of travel now", "Cost of travel then"],
+          datasets: [
+            {
+              data: [500000, 925465],
+              backgroundColor: ["#e3b23c", "#c02c7c"],
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } },
+        },
+      });
+
+      timeInput.addEventListener("input", calculate);
+      costInput.addEventListener("input", calculate);
+      returnInput.addEventListener("input", calculate);
+      document
+        .querySelectorAll('input[name="periodType"]')
+        .forEach((r) => r.addEventListener("change", calculate));
+
+      calculate();
+    </script>
+  </body>
+</html>

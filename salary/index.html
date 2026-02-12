@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Salary Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f4f4;
+        padding: 40px;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: auto;
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      .wrapper {
+        display: flex;
+        gap: 40px;
+        position: relative;
+      }
+
+      .wrapper::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        border-left: 1px solid #e2e2e2;
+      }
+
+      .left,
+      .right {
+        flex: 1;
+        padding: 0 20px;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+      }
+
+      .label {
+        font-weight: 600;
+        margin-top: 25px;
+      }
+
+      .value-box {
+        float: right;
+        background: #f5eef2;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #c02c7c;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #c02c7c;
+        margin-top: 10px;
+      }
+
+      .summary {
+        text-align: center;
+      }
+
+      .big-amount {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 10px 0 20px;
+      }
+
+      .summary-box {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .yellow {
+        color: #e3b23c;
+        font-weight: bold;
+      }
+      .pink {
+        color: #c02c7c;
+        font-weight: bold;
+      }
+
+      canvas {
+        max-width: 320px;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="wrapper">
+        <div class="left">
+          <h2>Salary Calculator</h2>
+
+          <div class="label">
+            Annual CTC
+            <span class="value-box" id="ctcVal">₹ 8,00,000</span>
+          </div>
+          <input
+            type="range"
+            id="ctc"
+            min="200000"
+            max="5000000"
+            step="50000"
+            value="800000"
+          />
+
+          <div class="label">
+            Tax (%)
+            <span class="value-box" id="taxVal">10%</span>
+          </div>
+          <input type="range" id="tax" min="0" max="30" value="10" />
+
+          <div class="label">
+            PF (%)
+            <span class="value-box" id="pfVal">12%</span>
+          </div>
+          <input type="range" id="pf" min="0" max="20" value="12" />
+
+          <div class="label">
+            Other Deductions (Yearly)
+            <span class="value-box" id="otherVal">₹ 20,000</span>
+          </div>
+          <input
+            type="range"
+            id="other"
+            min="0"
+            max="200000"
+            step="5000"
+            value="20000"
+          />
+        </div>
+
+        <div class="right">
+          <div class="summary">
+            <div>Net Annual Salary</div>
+            <div class="big-amount" id="netAnnual">₹ 5,84,000</div>
+
+            <canvas id="chart"></canvas>
+
+            <div class="summary-box">
+              <span>Net Monthly Salary</span>
+              <span class="yellow" id="netMonthly">₹ 48,667</span>
+            </div>
+
+            <div class="summary-box">
+              <span>Total Deductions</span>
+              <span class="pink" id="deductions">₹ 2,16,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const ctcInput = document.getElementById("ctc");
+      const taxInput = document.getElementById("tax");
+      const pfInput = document.getElementById("pf");
+      const otherInput = document.getElementById("other");
+
+      function format(num) {
+        return num.toLocaleString("en-IN");
+      }
+
+      function calculate() {
+        const ctc = parseFloat(ctcInput.value);
+        const tax = parseFloat(taxInput.value) / 100;
+        const pf = parseFloat(pfInput.value) / 100;
+        const other = parseFloat(otherInput.value);
+
+        const taxAmount = ctc * tax;
+        const pfAmount = ctc * pf;
+
+        const totalDeductions = taxAmount + pfAmount + other;
+        const netAnnual = ctc - totalDeductions;
+        const netMonthly = netAnnual / 12;
+
+        document.getElementById("ctcVal").innerText = "₹ " + format(ctc);
+
+        document.getElementById("taxVal").innerText = taxInput.value + "%";
+
+        document.getElementById("pfVal").innerText = pfInput.value + "%";
+
+        document.getElementById("otherVal").innerText = "₹ " + format(other);
+
+        document.getElementById("netAnnual").innerText =
+          "₹ " + format(Math.round(netAnnual));
+
+        document.getElementById("netMonthly").innerText =
+          "₹ " + format(Math.round(netMonthly));
+
+        document.getElementById("deductions").innerText =
+          "₹ " + format(Math.round(totalDeductions));
+
+        chart.data.datasets[0].data = [netAnnual, totalDeductions];
+        chart.update();
+      }
+
+      const ctx = document.getElementById("chart");
+
+      const chart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Net Salary", "Total Deductions"],
+          datasets: [
+            {
+              data: [584000, 216000],
+              backgroundColor: ["#e3b23c", "#c02c7c"],
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { position: "top" } },
+          cutout: "65%",
+        },
+      });
+
+      [ctcInput, taxInput, pfInput, otherInput].forEach((el) =>
+        el.addEventListener("input", calculate),
+      );
+
+      calculate();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sukanya Samriddhi Yojana Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f4f4;
+        padding: 40px;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: auto;
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      .wrapper {
+        display: flex;
+        gap: 40px;
+        position: relative;
+      }
+
+      .wrapper::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        border-left: 1px solid #e2e2e2;
+      }
+
+      .left,
+      .right {
+        flex: 1;
+        padding: 0 20px;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+      }
+
+      .label {
+        font-weight: 600;
+        margin-top: 25px;
+      }
+
+      .value-box {
+        float: right;
+        background: #f5eef2;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #c02c7c;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #c02c7c;
+        margin-top: 10px;
+      }
+
+      .summary {
+        text-align: center;
+      }
+
+      .big-amount {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 10px 0 20px;
+      }
+
+      .summary-box {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .yellow {
+        color: #e3b23c;
+        font-weight: bold;
+      }
+      .pink {
+        color: #c02c7c;
+        font-weight: bold;
+      }
+
+      canvas {
+        max-width: 320px;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="wrapper">
+        <div class="left">
+          <h2>Sukanya Samriddhi Yojana Calculator</h2>
+
+          <div class="label">
+            Girl's Current Age
+            <span class="value-box" id="ageVal">5</span>
+          </div>
+          <input type="range" id="age" min="0" max="14" value="5" />
+
+          <div class="label">
+            Yearly Investment
+            <span class="value-box" id="investmentVal">₹ 1,00,000</span>
+          </div>
+          <input
+            type="range"
+            id="investment"
+            min="250"
+            max="150000"
+            step="250"
+            value="100000"
+          />
+
+          <div class="label">
+            Interest Rate (%)
+            <span class="value-box" id="rateVal">8%</span>
+          </div>
+          <input type="range" id="rate" min="5" max="12" step="0.1" value="8" />
+        </div>
+
+        <div class="right">
+          <div class="summary">
+            <div>Maturity Amount (At Age 21)</div>
+            <div class="big-amount" id="maturity">₹ 43,92,000</div>
+
+            <canvas id="chart"></canvas>
+
+            <div class="summary-box">
+              <span>Total Invested</span>
+              <span class="yellow" id="invested">₹ 10,00,000</span>
+            </div>
+
+            <div class="summary-box">
+              <span>Total Interest Earned</span>
+              <span class="pink" id="interest">₹ 33,92,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const ageInput = document.getElementById("age");
+      const investmentInput = document.getElementById("investment");
+      const rateInput = document.getElementById("rate");
+
+      function format(num) {
+        return num.toLocaleString("en-IN");
+      }
+
+      function calculate() {
+        const age = parseInt(ageInput.value);
+        const P = parseFloat(investmentInput.value);
+        const r = parseFloat(rateInput.value) / 100;
+
+        const investYears = 15 - age;
+        const maturityYears = 21 - age;
+        const remainingYears = maturityYears - investYears;
+
+        let investedAmount = P * investYears;
+
+        // FV during investment period
+        const fvInvest = P * ((Math.pow(1 + r, investYears) - 1) / r);
+
+        // Compounding remaining years
+        const maturity = fvInvest * Math.pow(1 + r, remainingYears);
+
+        const interestEarned = maturity - investedAmount;
+
+        document.getElementById("ageVal").innerText = age;
+        document.getElementById("investmentVal").innerText = "₹ " + format(P);
+        document.getElementById("rateVal").innerText = rateInput.value + "%";
+
+        document.getElementById("maturity").innerText =
+          "₹ " + format(Math.round(maturity));
+
+        document.getElementById("invested").innerText =
+          "₹ " + format(investedAmount);
+
+        document.getElementById("interest").innerText =
+          "₹ " + format(Math.round(interestEarned));
+
+        chart.data.datasets[0].data = [
+          investedAmount,
+          Math.round(interestEarned),
+        ];
+        chart.update();
+      }
+
+      const ctx = document.getElementById("chart");
+
+      const chart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Total Invested", "Total Interest"],
+          datasets: [
+            {
+              data: [1000000, 3392000],
+              backgroundColor: ["#e3b23c", "#c02c7c"],
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { position: "top" } },
+          cutout: "65%",
+        },
+      });
+
+      [ageInput, investmentInput, rateInput].forEach((el) =>
+        el.addEventListener("input", calculate),
+      );
+
+      calculate();
+    </script>
+  </body>
+</html>

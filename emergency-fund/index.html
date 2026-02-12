@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emergency Fund Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f4f4;
+        padding: 40px;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: auto;
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      .wrapper {
+        display: flex;
+        gap: 40px;
+        position: relative;
+      }
+
+      .wrapper::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        border-left: 1px solid #e2e2e2;
+      }
+
+      .left,
+      .right {
+        flex: 1;
+        padding: 0 20px;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+      }
+
+      .label {
+        font-weight: 600;
+        margin-top: 25px;
+      }
+
+      .value-box {
+        float: right;
+        background: #f5eef2;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #c02c7c;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #c02c7c;
+        margin-top: 10px;
+      }
+
+      .summary {
+        text-align: center;
+      }
+
+      .big-amount {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 10px 0 20px;
+      }
+
+      .summary-box {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .yellow {
+        color: #e3b23c;
+        font-weight: bold;
+      }
+      .pink {
+        color: #c02c7c;
+        font-weight: bold;
+      }
+
+      canvas {
+        max-width: 420px;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="wrapper">
+        <div class="left">
+          <h2>Emergency Fund Calculator</h2>
+
+          <div class="label">
+            Monthly Expenses
+            <span class="value-box" id="expenseVal">₹ 40,000</span>
+          </div>
+          <input
+            type="range"
+            id="expense"
+            min="10000"
+            max="200000"
+            step="1000"
+            value="40000"
+          />
+
+          <div class="label">
+            Months to Cover
+            <span class="value-box" id="monthsVal">6</span>
+          </div>
+          <input type="range" id="months" min="3" max="12" value="6" />
+
+          <div class="label">
+            Current Savings
+            <span class="value-box" id="savingsVal">₹ 1,00,000</span>
+          </div>
+          <input
+            type="range"
+            id="savings"
+            min="0"
+            max="2000000"
+            step="10000"
+            value="100000"
+          />
+        </div>
+
+        <div class="right">
+          <div class="summary">
+            <div>Required Emergency Fund</div>
+            <div class="big-amount" id="requiredFund">₹ 2,40,000</div>
+
+            <canvas id="chart"></canvas>
+
+            <div class="summary-box">
+              <span>Current Savings</span>
+              <span class="yellow" id="currentDisplay">₹ 1,00,000</span>
+            </div>
+
+            <div class="summary-box">
+              <span>Additional Needed</span>
+              <span class="pink" id="neededDisplay">₹ 1,40,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const expenseInput = document.getElementById("expense");
+      const monthsInput = document.getElementById("months");
+      const savingsInput = document.getElementById("savings");
+
+      function format(num) {
+        return num.toLocaleString("en-IN");
+      }
+
+      function calculate() {
+        const expense = parseFloat(expenseInput.value);
+        const months = parseInt(monthsInput.value);
+        const savings = parseFloat(savingsInput.value);
+
+        const required = expense * months;
+        const additional = Math.max(required - savings, 0);
+
+        document.getElementById("expenseVal").innerText =
+          "₹ " + format(expense);
+
+        document.getElementById("monthsVal").innerText = months;
+
+        document.getElementById("savingsVal").innerText =
+          "₹ " + format(savings);
+
+        document.getElementById("requiredFund").innerText =
+          "₹ " + format(required);
+
+        document.getElementById("currentDisplay").innerText =
+          "₹ " + format(savings);
+
+        document.getElementById("neededDisplay").innerText =
+          "₹ " + format(additional);
+
+        chart.data.datasets[0].data = [savings, required];
+        chart.update();
+      }
+
+      const ctx = document.getElementById("chart");
+
+      const chart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Current Savings", "Required Fund"],
+          datasets: [
+            {
+              data: [100000, 240000],
+              backgroundColor: ["#e3b23c", "#c02c7c"],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: "#e0e0e0",
+              },
+            },
+            x: {
+              grid: {
+                display: false,
+              },
+            },
+          },
+        },
+      });
+
+      [expenseInput, monthsInput, savingsInput].forEach((el) =>
+        el.addEventListener("input", calculate),
+      );
+
+      calculate();
+    </script>
+  </body>
+</html>
