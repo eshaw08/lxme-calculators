@@ -1,274 +1,1213 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Travel Calculator</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- ============ TRAVEL CALCULATOR FOR WORDPRESS ============ -->
+<section id="travel-calculator">
+  <div class="travel-card">
+    <!-- LEFT SIDE -->
+    <div class="travel-left">
+      <div class="header">
+        <h2>Travel Calculator</h2>
+        <a
+          href="https://lxme.in/?source_caller=ui&shortlink=mymoneytab04&c=lxme-website&pid=mymoneytab-Travel%20calc-%20website&deep_link_value=mymoneytab&af_xp=custom"
+          class="btn-primary"
+          target="_blank"
+        >
+          Invest Now
+        </a>
+      </div>
 
-    <style>
-      body {
-        font-family: "Segoe UI", sans-serif;
-        background: #f4f4f4;
-        padding: 40px;
-      }
-      .wrapper {
-        display: flex;
-        gap: 40px;
-        position: relative;
-      }
+      <div class="tip-box">
+        💡 Start investing today to make your dream vacation a reality!
+      </div>
 
-      .wrapper::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 50%;
-        width: 1px;
-        background: #ddd;
-      }
-      .container {
-        max-width: 1200px;
-        margin: auto;
-        background: #fff;
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-      }
+      <!-- Time Mode Toggle -->
+      <div class="mode-toggle">
+        <button id="yearsModeBtn" class="active">Plan in Years</button>
+        <button id="monthsModeBtn">Plan in Months</button>
+      </div>
 
-      h1 {
-        margin-bottom: 30px;
-      }
+      <!-- Destination -->
+      <div class="field">
+        <label>Where are you planning to travel?</label>
+        <input
+          type="text"
+          id="destinationInput"
+          placeholder="e.g., Paris, Tokyo, Maldives"
+          class="text-input"
+        />
+      </div>
 
-      .wrapper {
-        display: flex;
-        gap: 40px;
-      }
-
-      .left,
-      .right {
-        flex: 1;
-      }
-
-      .label {
-        font-weight: 600;
-        margin-top: 20px;
-      }
-
-      .value-display {
-        font-size: 28px;
-        font-weight: bold;
-        margin: 10px 0;
-      }
-
-      input[type="range"] {
-        width: 100%;
-        accent-color: #f30082;
-      }
-
-      .toggle {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 10px;
-      }
-
-      .toggle input {
-        accent-color: #f30082;
-      }
-
-      .summary-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-top: 30px;
-      }
-
-      .box {
-        background: #f5f5f5;
-        padding: 25px;
-        border-radius: 12px;
-        text-align: center;
-      }
-
-      .box h3 {
-        font-size: 14px;
-        margin-bottom: 10px;
-        color: #666;
-      }
-
-      .amount {
-        font-size: 26px;
-        font-weight: bold;
-      }
-
-      .yellow {
-        color: #e3b23c;
-      }
-      .pink {
-        color: #f30082;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Travel Calculator</h1>
-
-      <div class="wrapper">
-        <!-- LEFT SIDE -->
-        <div class="left">
-          <div class="label">Where Are You Planning To Travel?</div>
-          <div class="value-display">Dubai</div>
-
-          <div class="label">When Do You Want To Travel?</div>
-
-          <div class="toggle">
-            <label
-              ><input type="radio" name="periodType" value="months" checked />
-              Months</label
-            >
-            <label
-              ><input type="radio" name="periodType" value="years" />
-              Years</label
-            >
-          </div>
-
-          <div class="value-display" id="timeDisplay">8 Months</div>
-          <input type="range" id="time" min="1" max="60" value="8" />
-
-          <div class="label">How Much Money Do You Need Today?</div>
-          <div class="value-display" id="costDisplay">₹ 500,000</div>
-          <input
-            type="range"
-            id="cost"
-            min="10000"
-            max="2000000"
-            step="10000"
-            value="500000"
-          />
-
-          <div class="label">Expected Rate Of Return</div>
-          <div class="value-display" id="returnDisplay">15%</div>
-          <input type="range" id="returnRate" min="1" max="25" value="15" />
-
-          <div style="margin-top: 10px; color: #666; font-size: 14px">
-            Assumed Inflation: 8%
+      <!-- Time Period -->
+      <div class="field">
+        <div class="label-row">
+          <label>When do you want to travel?</label>
+          <div class="input-box">
+            <input type="number" id="timeInput" value="3" min="1" max="30" />
+            <span id="timeUnit">Yr</span>
           </div>
         </div>
+        <input type="range" id="timeRange" min="1" max="30" value="3" />
+        <div class="minmax">
+          <span id="timeMin">1 Year</span>
+          <span id="timeMax">30 Years</span>
+        </div>
+      </div>
 
-        <!-- RIGHT SIDE -->
-        <div class="right">
-          <canvas id="chart"></canvas>
-
-          <div class="summary-grid">
-            <div class="box">
-              <h3>Cost of travel now</h3>
-              <div class="amount yellow" id="nowCost">₹ 500,000</div>
-            </div>
-
-            <div class="box">
-              <h3>Cost of travel then</h3>
-              <div class="amount pink" id="futureCost">₹ 925,465</div>
-            </div>
-
-            <div class="box">
-              <h3>Required SIP</h3>
-              <div class="amount pink" id="sipAmount">₹ 4,977</div>
-            </div>
-
-            <div class="box">
-              <h3>Required Lumpsum</h3>
-              <div class="amount yellow" id="lumpAmount">₹ 302,536</div>
-            </div>
+      <!-- Cost Today -->
+      <div class="field">
+        <div class="label-row">
+          <label>How much money do you need today?</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="costInput"
+              value="200000"
+              min="1000"
+              max="10000000"
+            />
           </div>
         </div>
+        <input
+          type="range"
+          id="costRange"
+          min="1000"
+          max="10000000"
+          step="1000"
+          value="200000"
+        />
+        <div class="minmax">
+          <span>₹1,000</span>
+          <span>₹1,00,00,000</span>
+        </div>
+      </div>
+
+      <!-- Expected Return Rate -->
+      <div class="field">
+        <div class="label-row">
+          <label>
+            Expected rate of return (p.a.)
+            <button class="info-btn" id="rateInfoBtn" type="button">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="7"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M8 7V11M8 5V5.5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </label>
+          <div class="input-box">
+            <input type="number" id="rateInput" value="14" min="1" max="30" />
+            %
+          </div>
+        </div>
+        <div class="info-message" id="rateInfoMessage">
+          The expected rate of return may vary based on the duration by which
+          you wish to travel
+        </div>
+        <input type="range" id="rateRange" min="1" max="30" value="14" />
+        <div class="minmax">
+          <span>1%</span>
+          <span>30%</span>
+        </div>
+      </div>
+
+      <!-- Assumed Inflation -->
+      <div class="inflation-note">
+        <span>Assumed Inflation Rate</span>
+        <strong>8% p.a.</strong>
       </div>
     </div>
 
-    <script>
-      const inflation = 0.08;
+    <!-- RIGHT SIDE -->
+    <div class="travel-right">
+      <h4>
+        Cost of Travel Then
+        <button class="info-btn" id="travelInfoBtn" type="button">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle
+              cx="8"
+              cy="8"
+              r="7"
+              stroke="currentColor"
+              stroke-width="1.5"
+            />
+            <path
+              d="M8 7V11M8 5V5.5"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </h4>
+      <div class="info-message" id="travelInfoMessage">
+        Your goal amount is revised assuming 8% p.a. inflation
+      </div>
+      <h1>₹ <span id="costThen">0</span></h1>
 
-      const timeInput = document.getElementById("time");
-      const costInput = document.getElementById("cost");
-      const returnInput = document.getElementById("returnRate");
+      <div class="chart-legend">
+        <span><span class="dot yellow"></span> Current cost</span>
+        <span><span class="dot pink"></span> Cost increase</span>
+      </div>
 
-      const timeDisplay = document.getElementById("timeDisplay");
-      const costDisplay = document.getElementById("costDisplay");
-      const returnDisplay = document.getElementById("returnDisplay");
+      <canvas id="travelChart"></canvas>
 
-      const nowCost = document.getElementById("nowCost");
-      const futureCost = document.getElementById("futureCost");
-      const sipAmount = document.getElementById("sipAmount");
-      const lumpAmount = document.getElementById("lumpAmount");
+      <div class="summary">
+        <div>
+          <span>Current cost</span>
+          <strong class="yellow">₹ <span id="costNow">0</span></strong>
+        </div>
+        <div>
+          <span>Cost increase</span>
+          <strong class="pink">₹ <span id="costIncrease">0</span></strong>
+        </div>
+      </div>
 
-      function format(num) {
-        return num.toLocaleString("en-IN");
+      <div class="investment-summary">
+        <div>
+          <span>Required Monthly SIP</span>
+          <strong id="requiredSIP">₹0</strong>
+        </div>
+        <div>
+          <span>Required Lumpsum</span>
+          <strong id="requiredLumpsum">₹0</strong>
+        </div>
+      </div>
+
+      <a
+        href="https://lxme.in/?source_caller=ui&shortlink=mymoneytab04&c=lxme-website&pid=mymoneytab-Travel%20calc-%20website&deep_link_value=mymoneytab&af_xp=custom"
+        class="btn-primary big"
+        target="_blank"
+      >
+        Invest Now
+      </a>
+    </div>
+  </div>
+
+  <!-- Nudge Message -->
+  <div class="nudge-message" id="nudgeMessage">
+    💡 Invest in your dreams, the time is NOW!
+  </div>
+
+  <!-- Popular Destinations Table -->
+  <div class="popular-destinations">
+    <h3>
+      Average Costs for Popular Travel Destinations
+      <button class="info-btn" id="destInfoBtn" type="button">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle
+            cx="8"
+            cy="8"
+            r="7"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+          <path
+            d="M8 7V11M8 5V5.5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    </h3>
+    <div class="info-message" id="destInfoMessage">
+      These costs may vary based on your personal travel preferences and luxury
+      choices.
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Popular Destinations</th>
+          <th>Tentative Costs of Travel today</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Udaipur</td>
+          <td>₹35,000</td>
+        </tr>
+        <tr>
+          <td>Maldives</td>
+          <td>₹1,00,000</td>
+        </tr>
+        <tr>
+          <td>Vietnam</td>
+          <td>₹80,000</td>
+        </tr>
+        <tr>
+          <td>Japan</td>
+          <td>₹2,20,000</td>
+        </tr>
+        <tr>
+          <td>Turkey</td>
+          <td>₹2,50,000</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Expected Rate Logic Table -->
+  <div class="logic-table">
+    <h3>
+      Logic for Intuitive and automated expected rate of returns for the time
+      period
+      <button class="info-btn" id="logicInfoBtn" type="button">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle
+            cx="8"
+            cy="8"
+            r="7"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+          <path
+            d="M8 7V11M8 5V5.5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    </h3>
+    <div class="info-message" id="logicInfoMessage">
+      The expected rate of return may vary based on the duration by which you
+      wish to travel
+    </div>
+    <p class="logic-note">
+      It can be shown as a pre-filled value, but it should still be editable for
+      the user
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Time Period</th>
+          <th>Expected Rate of Return</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Upto 1 year or Upto 12 months</td>
+          <td>6%</td>
+        </tr>
+        <tr>
+          <td>1 year to 3 year or 13months to 36 months</td>
+          <td>10%</td>
+        </tr>
+        <tr>
+          <td>More than 3 years or more than 36 months</td>
+          <td>14%</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="logic-footer">
+      The expected rate of return may vary based on the duration by which you
+      wish to travel
+    </p>
+  </div>
+</section>
+
+<!-- ============ CSS ============ -->
+<style>
+  #travel-calculator * {
+    font-family:
+      Inter,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+    box-sizing: border-box;
+  }
+
+  #travel-calculator {
+    padding: 40px 20px;
+    background: #f9f9f9;
+  }
+
+  .travel-card {
+    max-width: 1200px;
+    margin: auto;
+    background: #fff;
+    border-radius: 24px;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    border: 1px solid #e9e9e9;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header h2 {
+    margin: 0;
+    font-size: 28px;
+    color: #333;
+  }
+
+  .btn-primary {
+    background: #d63a8d;
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 30px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background: #c02e7a;
+  }
+
+  .tip-box {
+    background: #fff7e6;
+    padding: 16px;
+    border-radius: 12px;
+    margin: 20px 0 30px;
+    text-align: center;
+  }
+
+  .mode-toggle {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+
+  .mode-toggle button {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #e5e5e5;
+    background: #fff;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mode-toggle button.active {
+    background: #d63a8d;
+    color: #fff;
+    border-color: #d63a8d;
+  }
+
+  .mode-toggle button:hover:not(.active) {
+    border-color: #d63a8d;
+    color: #d63a8d;
+  }
+
+  .field {
+    margin-bottom: 32px;
+  }
+
+  .field label {
+    display: block;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .text-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #e5e5e5;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .text-input:focus {
+    border-color: #d63a8d;
+  }
+
+  .label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .label-row label {
+    margin: 0;
+  }
+
+  .input-box {
+    background: #fff1f7;
+    padding: 6px 14px;
+    border-radius: 8px;
+    color: #d63a8d;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .input-box input {
+    width: 80px;
+    border: none;
+    background: transparent;
+    text-align: right;
+    font-weight: 600;
+    outline: none;
+    color: #d63a8d;
+    font-size: 15px;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    margin-top: 10px;
+    accent-color: #d63a8d;
+    cursor: pointer;
+  }
+
+  .minmax {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-top: 6px;
+    color: #666;
+  }
+
+  .inflation-note {
+    background: #fff7e6;
+    padding: 14px 16px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .inflation-note span {
+    color: #666;
+    font-size: 14px;
+  }
+
+  .inflation-note strong {
+    color: #f2b705;
+    font-size: 16px;
+  }
+
+  /* RIGHT SIDE */
+  .travel-left {
+    position: relative;
+    padding-right: 40px;
+  }
+
+  .travel-left::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -25px;
+    width: 1px;
+    height: 100%;
+    background: #e5e5e5;
+  }
+
+  .travel-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .travel-right h4 {
+    color: #666;
+    margin: 0 0 4px 0;
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .travel-right h1 {
+    font-size: 42px;
+    margin: 0 0 20px 0;
+    color: #000;
+  }
+
+  /* INFO BUTTON */
+  .info-btn {
+    background: none;
+    border: none;
+    color: #d63a8d;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+  }
+
+  .info-btn:hover {
+    transform: scale(1.1);
+    color: #c02e7a;
+  }
+
+  .info-message {
+    background: #fff7e6;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #f2b705;
+    border: 1px solid #f2c94c;
+    display: none;
+    text-align: center;
+  }
+
+  .info-message.show {
+    display: block;
+  }
+
+  .chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  .dot.yellow {
+    background: #f2c94c;
+  }
+
+  .dot.pink {
+    background: #d63a8d;
+  }
+
+  canvas {
+    width: 100% !important;
+    max-height: 300px;
+    margin-bottom: 20px;
+  }
+
+  .summary {
+    margin-top: 20px;
+    display: grid;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .summary div {
+    background: #f7f7f7;
+    padding: 16px 22px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .summary span {
+    color: #666;
+    font-size: 14px;
+  }
+
+  .summary strong {
+    font-size: 18px;
+  }
+
+  .yellow {
+    color: #f2b705;
+  }
+
+  .pink {
+    color: #d63a8d;
+  }
+
+  .investment-summary {
+    margin-top: 20px;
+    display: grid;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .investment-summary div {
+    background: #f0f9ff;
+    padding: 16px 22px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .investment-summary span {
+    color: #666;
+    font-size: 14px;
+  }
+
+  .investment-summary strong {
+    color: #0284c7;
+    font-size: 18px;
+  }
+
+  .big {
+    margin-top: 30px;
+    width: 220px;
+  }
+
+  /* NUDGE MESSAGE */
+  .nudge-message {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff7e6 0%, #ffe6f0 100%);
+    border-radius: 16px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    border: 2px solid #f2c94c;
+  }
+
+  /* POPULAR DESTINATIONS */
+  .popular-destinations {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e9e9e9;
+  }
+
+  .popular-destinations h3 {
+    margin: 0 0 12px 0;
+    font-size: 24px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .destinations-note {
+    margin: 0 0 24px 0;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .popular-destinations table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  .popular-destinations th,
+  .popular-destinations td {
+    padding: 14px 20px;
+    text-align: left;
+    border-bottom: 1px solid #e9e9e9;
+  }
+
+  .popular-destinations th {
+    background: #f7f7f7;
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+  }
+
+  .popular-destinations td {
+    font-size: 15px;
+    color: #666;
+  }
+
+  .popular-destinations td:last-child {
+    font-weight: 600;
+    color: #d63a8d;
+  }
+
+  .popular-destinations tbody tr:hover {
+    background: #fafafa;
+  }
+
+  /* LOGIC TABLE */
+  .logic-table {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e9e9e9;
+  }
+
+  .logic-table h3 {
+    margin: 0 0 12px 0;
+    font-size: 24px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logic-note {
+    margin: 0 0 20px 0;
+    color: #999;
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  .logic-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  .logic-table th,
+  .logic-table td {
+    padding: 14px 20px;
+    text-align: left;
+    border-bottom: 1px solid #e9e9e9;
+  }
+
+  .logic-table th {
+    background: #f7f7f7;
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+  }
+
+  .logic-table td {
+    font-size: 15px;
+    color: #666;
+  }
+
+  .logic-table td:last-child {
+    font-weight: 600;
+    color: #d63a8d;
+  }
+
+  .logic-table tbody tr:hover {
+    background: #fafafa;
+  }
+
+  .logic-footer {
+    margin: 20px 0 0 0;
+    color: #666;
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  /* MOBILE RESPONSIVE */
+  @media (max-width: 768px) {
+    #travel-calculator {
+      padding: 20px 12px;
+    }
+
+    .travel-card {
+      grid-template-columns: 1fr;
+      padding: 24px 20px;
+      gap: 30px;
+    }
+
+    .travel-left::after {
+      display: none;
+    }
+
+    .travel-left {
+      padding-right: 0;
+    }
+
+    .header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .header h2 {
+      font-size: 22px;
+    }
+
+    .mode-toggle {
+      flex-direction: column;
+    }
+
+    .travel-right h1 {
+      font-size: 36px;
+    }
+
+    canvas {
+      max-height: 250px !important;
+    }
+
+    .big {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .nudge-message {
+      font-size: 16px;
+      padding: 16px;
+      margin: 20px 16px;
+    }
+
+    .popular-destinations {
+      margin: 30px 16px;
+      padding: 24px 16px;
+    }
+
+    .popular-destinations h3 {
+      font-size: 20px;
+    }
+
+    .popular-destinations th,
+    .popular-destinations td {
+      padding: 12px 14px;
+      font-size: 14px;
+    }
+
+    .logic-table {
+      margin: 30px 16px;
+      padding: 24px 16px;
+    }
+
+    .logic-table h3 {
+      font-size: 18px;
+    }
+
+    .logic-table th,
+    .logic-table td {
+      padding: 12px 14px;
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .travel-card {
+      padding: 20px 16px;
+    }
+
+    .header h2 {
+      font-size: 20px;
+    }
+
+    .travel-right h1 {
+      font-size: 32px;
+    }
+
+    .input-box input {
+      width: 60px;
+      font-size: 14px;
+    }
+  }
+</style>
+
+<!-- ============ JAVASCRIPT ============ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  (function () {
+    // State variables
+    let timeMode = "years"; // 'years' or 'months'
+    const INFLATION_RATE = 0.08;
+
+    // Nudge messages
+    const nudgeMessages = [
+      "💡 Invest in your dreams, the time is NOW!",
+      "💡 Invest today, explore tomorrow!",
+      "💡 Future trips need today's investments.",
+      "💡 Travel smart: fund trips through investing.",
+    ];
+    let currentNudgeIndex = 0;
+
+    // DOM elements
+    const yearsModeBtn = document.getElementById("yearsModeBtn");
+    const monthsModeBtn = document.getElementById("monthsModeBtn");
+    const destinationInput = document.getElementById("destinationInput");
+    const timeInput = document.getElementById("timeInput");
+    const timeRange = document.getElementById("timeRange");
+    const timeUnit = document.getElementById("timeUnit");
+    const timeMin = document.getElementById("timeMin");
+    const timeMax = document.getElementById("timeMax");
+    const costInput = document.getElementById("costInput");
+    const costRange = document.getElementById("costRange");
+    const rateInput = document.getElementById("rateInput");
+    const rateRange = document.getElementById("rateRange");
+    const nudgeMessageEl = document.getElementById("nudgeMessage");
+    const travelInfoBtn = document.getElementById("travelInfoBtn");
+    const travelInfoMessage = document.getElementById("travelInfoMessage");
+    const rateInfoBtn = document.getElementById("rateInfoBtn");
+    const rateInfoMessage = document.getElementById("rateInfoMessage");
+    const destInfoBtn = document.getElementById("destInfoBtn");
+    const destInfoMessage = document.getElementById("destInfoMessage");
+    const logicInfoBtn = document.getElementById("logicInfoBtn");
+    const logicInfoMessage = document.getElementById("logicInfoMessage");
+
+    // Output elements
+    const costThenEl = document.getElementById("costThen");
+    const costNowEl = document.getElementById("costNow");
+    const costIncreaseEl = document.getElementById("costIncrease");
+    const requiredSIPEl = document.getElementById("requiredSIP");
+    const requiredLumpsumEl = document.getElementById("requiredLumpsum");
+
+    // Chart
+    let chart = null;
+    const chartCanvas = document.getElementById("travelChart");
+
+    // Info button toggles
+    travelInfoBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      travelInfoMessage.classList.toggle("show");
+    });
+
+    rateInfoBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      rateInfoMessage.classList.toggle("show");
+    });
+
+    destInfoBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      destInfoMessage.classList.toggle("show");
+    });
+
+    logicInfoBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      logicInfoMessage.classList.toggle("show");
+    });
+
+    // Rotate nudge messages every 5 seconds
+    setInterval(function () {
+      currentNudgeIndex = (currentNudgeIndex + 1) % nudgeMessages.length;
+      nudgeMessageEl.textContent = nudgeMessages[currentNudgeIndex];
+    }, 5000);
+
+    // Auto-adjust return rate based on time period
+    function autoAdjustReturnRate() {
+      const timePeriod = parseFloat(timeInput.value);
+      let suggestedRate;
+
+      if (timeMode === "years") {
+        if (timePeriod <= 1) {
+          suggestedRate = 6;
+        } else if (timePeriod <= 3) {
+          suggestedRate = 10;
+        } else {
+          suggestedRate = 14;
+        }
+      } else {
+        // Months mode
+        if (timePeriod <= 12) {
+          suggestedRate = 6;
+        } else if (timePeriod <= 36) {
+          suggestedRate = 10;
+        } else {
+          suggestedRate = 14;
+        }
       }
 
-      function calculate() {
-        const P = parseFloat(costInput.value);
-        const r = parseFloat(returnInput.value) / 100;
+      rateInput.value = suggestedRate;
+      rateRange.value = suggestedRate;
+    }
 
-        let time = parseFloat(timeInput.value);
-        const type = document.querySelector(
-          'input[name="periodType"]:checked',
-        ).value;
+    // Format currency
+    function formatCurrency(num) {
+      if (isNaN(num) || !isFinite(num)) return "₹0";
+      return "₹" + Math.round(num).toLocaleString("en-IN");
+    }
 
-        let years = type === "months" ? time / 12 : time;
+    // Calculate results
+    function calculate() {
+      const timePeriod = parseFloat(timeInput.value);
+      const currentCost = parseFloat(costInput.value);
+      const returnRate = parseFloat(rateInput.value) / 100;
 
-        // Future cost with inflation
-        const future = P * Math.pow(1 + inflation, years);
+      let costNow = currentCost;
+      let costThen, requiredSIP, requiredLumpsum;
+
+      if (timeMode === "years") {
+        // Calculate for years
+        costThen = currentCost * Math.pow(1 + INFLATION_RATE, timePeriod);
 
         // SIP calculation
-        const monthlyRate = r / 12;
-        const months = years * 12;
+        const monthlyRate = returnRate / 12;
+        const totalMonths = timePeriod * 12;
+        const step1 = 1 + monthlyRate;
+        const step2 = Math.pow(step1, totalMonths);
+        const step3 = step2 - 1;
+        const step4 = step3 / monthlyRate;
+        const step5 = step4 * step1;
+        requiredSIP = costThen / step5;
 
-        const sip =
-          (future * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
+        // Lumpsum calculation
+        requiredLumpsum = costThen / Math.pow(1 + returnRate, timePeriod);
+      } else {
+        // Calculate for months
+        costThen = currentCost * Math.pow(1 + INFLATION_RATE, timePeriod / 12);
 
-        // Lumpsum
-        const lump = future / Math.pow(1 + r, years);
+        // SIP calculation
+        const monthlyRate = returnRate / 12;
+        const step1 = 1 + monthlyRate;
+        const step2 = Math.pow(step1, timePeriod);
+        const step3 = step2 - 1;
+        const step4 = step3 / monthlyRate;
+        const step5 = step4 * step1;
+        requiredSIP = costThen / step5;
 
-        timeDisplay.innerText =
-          time + (type === "months" ? " Months" : " Years");
-        costDisplay.innerText = "₹ " + format(P);
-        returnDisplay.innerText = returnInput.value + "%";
-
-        nowCost.innerText = "₹ " + format(P);
-        futureCost.innerText = "₹ " + format(Math.round(future));
-        sipAmount.innerText = "₹ " + format(Math.round(sip));
-        lumpAmount.innerText = "₹ " + format(Math.round(lump));
-
-        chart.data.datasets[0].data = [P, Math.round(future)];
-        chart.update();
+        // Lumpsum calculation
+        requiredLumpsum = costThen / Math.pow(1 + returnRate, timePeriod / 12);
       }
 
-      const ctx = document.getElementById("chart");
+      const costIncrease = costThen - costNow;
 
-      const chart = new Chart(ctx, {
-        type: "bar",
+      // Update DOM
+      costThenEl.textContent = Math.round(costThen).toLocaleString("en-IN");
+      costNowEl.textContent = Math.round(costNow).toLocaleString("en-IN");
+      costIncreaseEl.textContent =
+        Math.round(costIncrease).toLocaleString("en-IN");
+      requiredSIPEl.textContent = formatCurrency(requiredSIP);
+      requiredLumpsumEl.textContent = formatCurrency(requiredLumpsum);
+
+      // Update chart
+      updateChart(costNow, costIncrease);
+    }
+
+    // Update chart
+    function updateChart(costNow, costIncrease) {
+      if (chart) {
+        chart.destroy();
+      }
+
+      chart = new Chart(chartCanvas, {
+        type: "doughnut",
         data: {
-          labels: ["Cost of travel now", "Cost of travel then"],
+          labels: ["Current Cost", "Cost Increase"],
           datasets: [
             {
-              data: [500000, 925465],
-              backgroundColor: ["#e3b23c", "#F30082"],
+              data: [costNow, costIncrease],
+              backgroundColor: ["#f2c94c", "#d63a8d"],
+              borderWidth: 0,
             },
           ],
         },
         options: {
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true } },
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: false,
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return (
+                    context.label +
+                    ": ₹" +
+                    Math.round(context.parsed).toLocaleString("en-IN")
+                  );
+                },
+              },
+            },
+          },
         },
       });
+    }
 
-      timeInput.addEventListener("input", calculate);
-      costInput.addEventListener("input", calculate);
-      returnInput.addEventListener("input", calculate);
-      document
-        .querySelectorAll('input[name="periodType"]')
-        .forEach((r) => r.addEventListener("change", calculate));
+    // Switch time mode
+    function switchMode(mode) {
+      timeMode = mode;
 
+      if (mode === "years") {
+        yearsModeBtn.classList.add("active");
+        monthsModeBtn.classList.remove("active");
+        timeInput.value = 3;
+        timeInput.min = 1;
+        timeInput.max = 30;
+        timeRange.value = 3;
+        timeRange.min = 1;
+        timeRange.max = 30;
+        timeUnit.textContent = "Yr";
+        timeMin.textContent = "1 Year";
+        timeMax.textContent = "30 Years";
+        costInput.value = 200000;
+        costRange.value = 200000;
+      } else {
+        monthsModeBtn.classList.add("active");
+        yearsModeBtn.classList.remove("active");
+        timeInput.value = 120;
+        timeInput.min = 1;
+        timeInput.max = 120;
+        timeRange.value = 120;
+        timeRange.min = 1;
+        timeRange.max = 120;
+        timeUnit.textContent = "Mo";
+        timeMin.textContent = "1 Month";
+        timeMax.textContent = "120 Months";
+        costInput.value = 500000;
+        costRange.value = 500000;
+      }
+
+      autoAdjustReturnRate();
       calculate();
-    </script>
-  </body>
-</html>
+    }
+
+    // Event listeners
+    yearsModeBtn.addEventListener("click", function () {
+      switchMode("years");
+    });
+
+    monthsModeBtn.addEventListener("click", function () {
+      switchMode("months");
+    });
+
+    // Sync inputs with ranges and auto-adjust return rate
+    timeRange.addEventListener("input", function () {
+      timeInput.value = this.value;
+      autoAdjustReturnRate();
+      calculate();
+    });
+
+    timeInput.addEventListener("input", function () {
+      timeRange.value = this.value;
+      autoAdjustReturnRate();
+      calculate();
+    });
+
+    costRange.addEventListener("input", function () {
+      costInput.value = this.value;
+      calculate();
+    });
+
+    costInput.addEventListener("input", function () {
+      costRange.value = this.value;
+      calculate();
+    });
+
+    rateRange.addEventListener("input", function () {
+      rateInput.value = this.value;
+      calculate();
+    });
+
+    rateInput.addEventListener("input", function () {
+      rateRange.value = this.value;
+      calculate();
+    });
+
+    // Initial calculation
+    autoAdjustReturnRate();
+    calculate();
+  })();
+</script>
