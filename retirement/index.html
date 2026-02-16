@@ -1,287 +1,906 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Retirement Planning Calculator</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- RETIREMENT CALCULATOR - WordPress Ready - CORRECTED VERSION -->
+<section id="retirement-calc">
+  <style>
+    #retirement-calc * {
+      font-family:
+        Inter,
+        -apple-system,
+        sans-serif;
+      box-sizing: border-box;
+    }
+    #retirement-calc {
+      padding: 40px 20px;
+      background: #f9f9f9;
+    }
+    .ret-card {
+      max-width: 1200px;
+      margin: auto;
+      background: #fff;
+      border-radius: 24px;
+      padding: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      border: 1px solid #e9e9e9;
+    }
+    .ret-left {
+      position: relative;
+      padding-right: 40px;
+      max-height: 700px;
+      overflow-y: auto;
+    }
+    .ret-left::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: -25px;
+      width: 1px;
+      height: 100%;
+      background: #e5e5e5;
+    }
+    .ret-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .header h2 {
+      margin: 0;
+      font-size: 28px;
+      color: #333;
+    }
+    .btn-primary {
+      background: #d63a8d;
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 30px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover {
+      background: #c02e7a;
+    }
+    .tip-box {
+      background: #fff7e6;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .field {
+      margin-bottom: 24px;
+    }
+    .field label {
+      display: block;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .label-row label {
+      margin: 0;
+      flex: 1;
+    }
+    .input-box {
+      background: #fff1f7;
+      padding: 6px 14px;
+      border-radius: 8px;
+      color: #d63a8d;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .input-box input {
+      width: 80px;
+      border: none;
+      background: transparent;
+      text-align: right;
+      font-weight: 600;
+      outline: none;
+      color: #d63a8d;
+      font-size: 15px;
+    }
+    input[type="range"] {
+      width: 100%;
+      margin-top: 10px;
+      accent-color: #d63a8d;
+      cursor: pointer;
+    }
+    .minmax {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-top: 6px;
+      color: #666;
+    }
+    .info-btn {
+      background: none;
+      border: none;
+      color: #d63a8d;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 6px;
+      display: inline-flex;
+      transition: transform 0.2s;
+    }
+    .info-btn:hover {
+      transform: scale(1.1);
+    }
+    .info-message {
+      background: #fff7e6;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #f2b705;
+      border: 1px solid #f2c94c;
+      display: none;
+    }
+    .info-message.show {
+      display: block;
+    }
+    .ret-right h4 {
+      color: #666;
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    .ret-right h1 {
+      font-size: 36px;
+      margin: 0 0 24px 0;
+      color: #000;
+    }
 
-    <style>
-      body {
-        font-family: "Segoe UI", sans-serif;
-        background: #f4f4f4;
-        padding: 40px;
-      }
+    /* Chart.js Graph Container - Emergency Fund Style */
+    .graph-container {
+      width: 100%;
+      max-width: 100%;
+      margin: 20px auto;
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #444;
+    }
+    .chart-legend .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .chart-legend .yellow {
+      background: #f2c94c;
+    }
+    .chart-legend .pink {
+      background: #d63a8d;
+    }
+    .graph-container canvas {
+      width: 100% !important;
+      max-height: 300px;
+      margin-bottom: 20px;
+    }
 
-      .container {
-        max-width: 1200px;
-        margin: auto;
-        background: #fff;
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    .output-box {
+      width: 100%;
+      background: #f7f7f7;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-box span {
+      font-size: 14px;
+      color: #666;
+    }
+    .output-box strong {
+      font-size: 18px;
+      color: #d63a8d;
+    }
+    .big {
+      margin-top: 24px;
+      width: 220px;
+    }
+    .section-divider {
+      margin: 30px 0;
+      border: none;
+      border-top: 2px solid #e5e5e5;
+    }
+    .section-title {
+      font-size: 18px;
+      color: #333;
+      margin: 0 0 20px 0;
+      font-weight: 600;
+    }
+    .info-cards {
+      max-width: 1200px;
+      margin: 40px auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .info-card {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid #e9e9e9;
+    }
+    .info-card h3 {
+      font-size: 20px;
+      color: #d63a8d;
+      margin: 0 0 12px 0;
+    }
+    .info-card p {
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .growth-table {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 30px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #e9e9e9;
+    }
+    .growth-table h3 {
+      margin: 0 0 20px 0;
+      font-size: 24px;
+      color: #333;
+    }
+    .growth-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .growth-table th,
+    .growth-table td {
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid #e9e9e9;
+    }
+    .growth-table th {
+      background: #f7f7f7;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+    .growth-table td {
+      font-size: 15px;
+      color: #666;
+    }
+    .growth-table td:last-child {
+      font-weight: 600;
+      color: #d63a8d;
+    }
+    .growth-table tr.highlight {
+      background: #fff1f7;
+    }
+    @media (max-width: 768px) {
+      .ret-card {
+        grid-template-columns: 1fr;
+        padding: 24px 20px;
+        gap: 30px;
       }
+      .ret-left::after {
+        display: none;
+      }
+      .ret-left {
+        padding-right: 0;
+        max-height: none;
+      }
+      .header {
+        flex-direction: column;
+        gap: 16px;
+      }
+      .info-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 
-      .wrapper {
-        display: flex;
-        gap: 40px;
-        position: relative;
-      }
+  <div class="ret-card">
+    <div class="ret-left">
+      <div class="header">
+        <h2>Retirement Calculator</h2>
+        <a href="https://lxme.in" class="btn-primary" target="_blank"
+          >Invest Now</a
+        >
+      </div>
+      <div class="tip-box">
+        💡 Start early and invest wisely for a comfortable retirement!
+      </div>
 
-      .wrapper::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 0;
-        bottom: 0;
-        border-left: 1px solid #e2e2e2;
-      }
-
-      .left,
-      .right {
-        flex: 1;
-        padding: 0 20px;
-      }
-
-      h2 {
-        margin-bottom: 20px;
-      }
-
-      .label {
-        font-weight: 600;
-        margin-top: 20px;
-      }
-
-      .value-box {
-        float: right;
-        background: #f5eef2;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 600;
-        color: #f30082;
-      }
-
-      input[type="range"] {
-        width: 100%;
-        accent-color: #f30082;
-        margin-top: 10px;
-      }
-
-      .range-labels {
-        display: flex;
-        justify-content: space-between;
-        font-size: 13px;
-        color: #777;
-      }
-
-      .summary {
-        text-align: center;
-      }
-
-      .big-amount {
-        font-size: 32px;
-        font-weight: bold;
-        margin: 10px 0 20px;
-      }
-
-      .summary-box {
-        background: #f5f5f5;
-        padding: 15px;
-        border-radius: 10px;
-        margin-top: 15px;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .yellow {
-        color: #e3b23c;
-        font-weight: bold;
-      }
-      .pink {
-        color: #f30082;
-        font-weight: bold;
-      }
-
-      canvas {
-        max-width: 300px;
-        margin: auto;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="wrapper">
-        <div class="left">
-          <h2>Retirement Planning Calculator</h2>
-
-          <div class="label">
-            Current Age
-            <span class="value-box" id="currentAgeVal">30</span>
+      <div class="field">
+        <div class="label-row">
+          <label>What is your current age?</label>
+          <div class="input-box">
+            <input type="number" id="currentAge" value="30" min="18" max="70" />
+            Years
           </div>
-          <input type="range" id="currentAge" min="18" max="60" value="30" />
-
-          <div class="label">
-            Retirement Age
-            <span class="value-box" id="retireAgeVal">60</span>
-          </div>
-          <input type="range" id="retireAge" min="40" max="70" value="60" />
-
-          <div class="label">
-            Monthly Expenses Today
-            <span class="value-box" id="expenseVal">₹ 50,000</span>
-          </div>
-          <input
-            type="range"
-            id="expense"
-            min="10000"
-            max="200000"
-            step="1000"
-            value="50000"
-          />
-
-          <div class="label">
-            Expected Inflation (%)
-            <span class="value-box" id="inflationVal">6%</span>
-          </div>
-          <input type="range" id="inflation" min="1" max="12" value="6" />
-
-          <div class="label">
-            Expected Return (%)
-            <span class="value-box" id="returnVal">12%</span>
-          </div>
-          <input type="range" id="returnRate" min="5" max="20" value="12" />
-
-          <div class="label">
-            Existing Savings
-            <span class="value-box" id="savingsVal">₹ 5,00,000</span>
-          </div>
-          <input
-            type="range"
-            id="savings"
-            min="0"
-            max="5000000"
-            step="50000"
-            value="500000"
-          />
         </div>
+        <input type="range" id="currentAgeRange" min="18" max="70" value="30" />
+        <div class="minmax"><span>18 years</span><span>70 years</span></div>
+      </div>
 
-        <div class="right">
-          <div class="summary">
-            <div>Required Retirement Corpus</div>
-            <div class="big-amount" id="corpusDisplay">₹ 3,72,15,000</div>
+      <div class="field">
+        <div class="label-row">
+          <label>At what age do you plan to retire?</label>
+          <div class="input-box">
+            <input type="number" id="retireAge" value="55" min="30" max="80" />
+            Years
+          </div>
+        </div>
+        <input type="range" id="retireAgeRange" min="30" max="80" value="55" />
+        <div class="minmax"><span>30 years</span><span>80 years</span></div>
+      </div>
 
-            <canvas id="chart"></canvas>
+      <div class="field">
+        <div class="label-row">
+          <label>
+            What is your life expectancy?
+            <button class="info-btn" id="lifeInfoBtn" type="button">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="7"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M8 7V11M8 5V5.5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </label>
+          <div class="input-box">
+            <input
+              type="number"
+              id="lifeExpect"
+              value="80"
+              min="50"
+              max="100"
+            />
+            Years
+          </div>
+        </div>
+        <div class="info-message" id="lifeInfoMessage">
+          Life expectancy is how long you're likely to live. Range: 50 to 100
+          years.
+        </div>
+        <input
+          type="range"
+          id="lifeExpectRange"
+          min="50"
+          max="100"
+          value="80"
+        />
+        <div class="minmax"><span>50 years</span><span>100 years</span></div>
+      </div>
 
-            <div class="summary-box">
-              <span>Future Monthly Expense</span>
-              <span class="yellow" id="futureExpense">₹ 2,87,000</span>
-            </div>
+      <hr class="section-divider" />
 
-            <div class="summary-box">
-              <span>Required Monthly SIP</span>
-              <span class="pink" id="sipDisplay">₹ 22,500</span>
-            </div>
+      <div class="field">
+        <div class="label-row">
+          <label>What is your current monthly expense?</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="monthlyExp"
+              value="40000"
+              min="1000"
+              max="1000000"
+            />
+          </div>
+        </div>
+        <input
+          type="range"
+          id="monthlyExpRange"
+          min="1000"
+          max="1000000"
+          step="1000"
+          value="40000"
+        />
+        <div class="minmax"><span>₹1,000</span><span>₹10,00,000</span></div>
+      </div>
 
-            <div class="summary-box">
-              <span>Existing Savings</span>
-              <span class="yellow" id="existingDisplay">₹ 5,00,000</span>
-            </div>
+      <div class="field">
+        <div class="label-row">
+          <label>Rate of return</label>
+          <div class="input-box">
+            <input type="number" id="rateReturn" value="14" min="1" max="30" />
+            %
+          </div>
+        </div>
+        <input type="range" id="rateReturnRange" min="1" max="30" value="14" />
+        <div class="minmax"><span>1%</span><span>30%</span></div>
+      </div>
+
+      <div class="field">
+        <label style="color: #666; font-size: 13px">
+          Assumed Inflation:
+          <strong style="color: #f2b705">8% p.a.</strong> (Fixed)
+        </label>
+      </div>
+
+      <hr class="section-divider" />
+      <p class="section-title">Existing Investments (Optional)</p>
+
+      <div class="field">
+        <div class="label-row">
+          <label>Existing Lumpsum Amount</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="existingLump"
+              value="0"
+              min="0"
+              max="10000000"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="label-row">
+          <label>Existing Monthly SIP</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="existingSIP"
+              value="0"
+              min="0"
+              max="500000"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="label-row">
+          <label>Rate of return on existing investments</label>
+          <div class="input-box">
+            <input
+              type="number"
+              id="existingRate"
+              value="12"
+              min="1"
+              max="30"
+            />
+            %
           </div>
         </div>
       </div>
     </div>
 
-    <script>
+    <div class="ret-right">
+      <h4>Retirement Goal Amount</h4>
+      <h1>₹ <span id="retireCorpus">0</span></h1>
+
+      <div class="graph-container">
+        <div class="chart-legend">
+          <span><span class="dot yellow"></span> Monthly Expenses</span>
+          <span
+            ><span class="dot pink"></span> Monthly Expenses at Retirement</span
+          >
+        </div>
+        <canvas id="calculatorChart"></canvas>
+      </div>
+
+      <div class="output-box">
+        <span>Required Monthly SIP</span>
+        <strong id="reqSIP">₹0</strong>
+      </div>
+
+      <div class="output-box">
+        <span>Required Lumpsum</span>
+        <strong id="reqLump">₹0</strong>
+      </div>
+
+      <div
+        id="revisedSection"
+        style="display: none; width: 100%; margin-top: 20px"
+      >
+        <p class="section-title">With Existing Investments</p>
+        <div class="output-box" style="background: #e8f5e9">
+          <span>Revised Corpus Required</span>
+          <strong style="color: #2e7d32" id="revCorpus">₹0</strong>
+        </div>
+        <div class="output-box" style="background: #e8f5e9">
+          <span>Revised SIP Required</span>
+          <strong style="color: #2e7d32" id="revSIP">₹0</strong>
+        </div>
+        <div class="output-box" style="background: #e8f5e9">
+          <span>Revised Lumpsum Required</span>
+          <strong style="color: #2e7d32" id="revLump">₹0</strong>
+        </div>
+      </div>
+
+      <a href="https://lxme.in" class="btn-primary big" target="_blank"
+        >Start Investing</a
+      >
+    </div>
+  </div>
+
+  <div class="info-cards">
+    <div class="info-card">
+      <h3>Nudge:</h3>
+      <p>
+        It's not how much you save, but how early you start and where you invest
+        makes all the difference!
+      </p>
+    </div>
+    <div class="info-card">
+      <h3>Did You Know?</h3>
+      <p>
+        Women retire with only 1/10th of money than a man does because of the
+        investment choices she makes!
+      </p>
+    </div>
+  </div>
+
+  <div class="growth-table">
+    <h3>How your Retirement Fund grows if kept at:</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Investment Type</th>
+          <th>Expected Returns</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Savings Account</td>
+          <td>3%</td>
+        </tr>
+        <tr>
+          <td>FD</td>
+          <td>6.45%</td>
+        </tr>
+        <tr class="highlight">
+          <td>LXME's Long Term Plan</td>
+          <td>17.28%</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top: 20px; color: #666; font-size: 14px">
+      Explore LXME's Long Term Plan, a smart and diversified way of investing
+      for your Retirement Fund!
+    </p>
+    <p
+      style="margin-top: 12px; color: #999; font-size: 12px; font-style: italic"
+    >
+      *The above data is the Last 3 Year CAGR of LXME's Long Term Plan, as of
+      2nd Dec 2024.
+    </p>
+  </div>
+</section>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  (function () {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+
+    function init() {
+      const INFLATION = 0.08; // Fixed 8% inflation
+
+      // Inputs
       const currentAge = document.getElementById("currentAge");
+      const currentAgeRange = document.getElementById("currentAgeRange");
       const retireAge = document.getElementById("retireAge");
-      const expense = document.getElementById("expense");
-      const inflation = document.getElementById("inflation");
-      const returnRate = document.getElementById("returnRate");
-      const savings = document.getElementById("savings");
+      const retireAgeRange = document.getElementById("retireAgeRange");
+      const lifeExpect = document.getElementById("lifeExpect");
+      const lifeExpectRange = document.getElementById("lifeExpectRange");
+      const monthlyExp = document.getElementById("monthlyExp");
+      const monthlyExpRange = document.getElementById("monthlyExpRange");
+      const rateReturn = document.getElementById("rateReturn");
+      const rateReturnRange = document.getElementById("rateReturnRange");
+      const existingLump = document.getElementById("existingLump");
+      const existingSIP = document.getElementById("existingSIP");
+      const existingRate = document.getElementById("existingRate");
 
-      function format(num) {
-        return num.toLocaleString("en-IN");
+      // Outputs
+      const retireCorpusEl = document.getElementById("retireCorpus");
+      const reqSIPEl = document.getElementById("reqSIP");
+      const reqLumpEl = document.getElementById("reqLump");
+      const revCorpusEl = document.getElementById("revCorpus");
+      const revSIPEl = document.getElementById("revSIP");
+      const revLumpEl = document.getElementById("revLump");
+      const revisedSection = document.getElementById("revisedSection");
+
+      // Chart
+      const ctx = document.getElementById("calculatorChart");
+      let calculatorChart = null;
+
+      // Info button
+      document
+        .getElementById("lifeInfoBtn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document.getElementById("lifeInfoMessage").classList.toggle("show");
+        });
+
+      // Currency formatter - digits only, no abbreviations
+      function formatCurrency(num) {
+        if (isNaN(num) || !isFinite(num)) return "0";
+        return Math.round(num).toLocaleString("en-IN");
       }
 
-      function calculate() {
-        const ageNow = parseInt(currentAge.value);
-        const ageRetire = parseInt(retireAge.value);
-        const monthlyExpense = parseFloat(expense.value);
-        const inflationRate = parseFloat(inflation.value) / 100;
-        const returnR = parseFloat(returnRate.value) / 100;
-        const existingSavings = parseFloat(savings.value);
-
-        const years = ageRetire - ageNow;
-
-        if (years <= 0) return;
-
-        const futureExpense =
-          monthlyExpense * Math.pow(1 + inflationRate, years);
-        const annualExpense = futureExpense * 12;
-
-        // 4% withdrawal rule
-        const corpus = annualExpense * 25;
-
-        const months = years * 12;
-        const monthlyRate = returnR / 12;
-
-        const sip =
-          ((corpus - existingSavings) * monthlyRate) /
-          (Math.pow(1 + monthlyRate, months) - 1);
-
-        document.getElementById("currentAgeVal").innerText = ageNow;
-        document.getElementById("retireAgeVal").innerText = ageRetire;
-        document.getElementById("expenseVal").innerText =
-          "₹ " + format(monthlyExpense);
-        document.getElementById("inflationVal").innerText =
-          inflation.value + "%";
-        document.getElementById("returnVal").innerText = returnRate.value + "%";
-        document.getElementById("savingsVal").innerText =
-          "₹ " + format(existingSavings);
-
-        document.getElementById("futureExpense").innerText =
-          "₹ " + format(Math.round(futureExpense));
-
-        document.getElementById("corpusDisplay").innerText =
-          "₹ " + format(Math.round(corpus));
-
-        document.getElementById("sipDisplay").innerText =
-          "₹ " + format(Math.round(sip > 0 ? sip : 0));
-
-        document.getElementById("existingDisplay").innerText =
-          "₹ " + format(existingSavings);
-
-        chart.data.datasets[0].data = [
-          existingSavings,
-          Math.max(corpus - existingSavings, 0),
-        ];
-        chart.update();
+      function formatCurrencyForChart(num) {
+        return "₹" + Math.round(num).toLocaleString("en-IN");
       }
 
-      const ctx = document.getElementById("chart");
+      // Update Chart.js graph to match the screenshot UI
+      function updateGraph(expNow, expRetire) {
+        if (calculatorChart) {
+          calculatorChart.destroy();
+        }
 
-      const chart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-          labels: ["Existing Savings", "Additional Required"],
-          datasets: [
-            {
-              data: [500000, 1000000],
-              backgroundColor: ["#e3b23c", "#F30082"],
+        calculatorChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: ["Monthly Expenses", "Monthly Expenses at Retirement"],
+            datasets: [
+              {
+                data: [expNow, expRetire],
+                backgroundColor: ["#f2c94c", "#d63a8d"],
+                borderWidth: 0,
+                barThickness: 120,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                padding: 12,
+                titleFont: {
+                  size: 13,
+                },
+                bodyFont: {
+                  size: 14,
+                  weight: "bold",
+                },
+                callbacks: {
+                  label: function (context) {
+                    return formatCurrencyForChart(context.parsed.y);
+                  },
+                },
+              },
             },
-          ],
-        },
-        options: {
-          plugins: { legend: { position: "top" } },
-          cutout: "65%",
-        },
+            scales: {
+              x: {
+                grid: {
+                  display: false,
+                  drawBorder: true,
+                  borderColor: "#d0d0d0",
+                  borderWidth: 1,
+                },
+                ticks: {
+                  font: {
+                    size: 12,
+                    family: "Inter, -apple-system, sans-serif",
+                  },
+                  color: "#666",
+                  padding: 8,
+                  maxRotation: 0,
+                  minRotation: 0,
+                },
+              },
+              y: {
+                beginAtZero: true,
+                border: {
+                  display: true,
+                  color: "#d0d0d0",
+                  width: 1,
+                },
+                grid: {
+                  color: "#e8e8e8",
+                  drawBorder: false,
+                },
+                ticks: {
+                  callback: function (value) {
+                    if (value === 0) return "₹0";
+                    return "₹" + value.toLocaleString("en-IN");
+                  },
+                  color: "#666",
+                  font: {
+                    size: 12,
+                    family: "Inter, -apple-system, sans-serif",
+                  },
+                  padding: 8,
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // Main calculation function based on Excel logic
+      function calculate() {
+        const age = parseFloat(currentAge.value) || 30;
+        const retire = parseFloat(retireAge.value) || 55;
+        const life = parseFloat(lifeExpect.value) || 80;
+        const expNow = parseFloat(monthlyExp.value) || 40000;
+        const rate = (parseFloat(rateReturn.value) || 14) / 100;
+
+        // Calculate time periods
+        const timeToRetire = retire - age; // Years until retirement
+        const yearsInRetire = life - retire; // Years in retirement
+        const monthsInRetire = yearsInRetire * 12;
+        const monthsToRetire = timeToRetire * 12;
+
+        // Step 1: Calculate monthly expense at retirement (with inflation)
+        // Formula: expNow * (1 + inflation)^timeToRetire
+        const expRetire = expNow * Math.pow(1 + INFLATION, timeToRetire);
+
+        // Step 2: Calculate real rate of return (adjusting for inflation)
+        // Formula: (1 + rate) / (1 + inflation) - 1
+        const realRate = (1 + rate) / (1 + INFLATION) - 1;
+        const monthlyRealRate = realRate / 12;
+
+        // Step 3: Calculate retirement corpus using PV of annuity formula
+        // Formula: expRetire * [(1 - (1 + r)^-n) / r]
+        // Where r = monthly real rate, n = months in retirement
+        const step1 = 1 + monthlyRealRate;
+        const step2 = Math.pow(step1, -monthsInRetire); // (1+r)^-n
+        const step3 = 1 - step2; // 1 - (1+r)^-n
+        const step4 = step3 / monthlyRealRate; // [1 - (1+r)^-n] / r
+        const corpus = step4 * expRetire;
+
+        // Step 4: Calculate required SIP using FV of annuity formula
+        // Formula: corpus = SIP * [((1+r)^n - 1) / r] * (1+r)
+        const monthlyRate = rate / 12;
+        const sipStep1 = 1 + monthlyRate;
+        const sipStep2 = Math.pow(sipStep1, monthsToRetire); // (1+r)^n
+        const sipStep3 = sipStep2 - 1; // (1+r)^n - 1
+        const sipStep4 = sipStep3 / monthlyRate; // [(1+r)^n - 1] / r
+        const sipStep5 = sipStep4 * sipStep1; // [(1+r)^n - 1] / r * (1+r)
+        const reqSIP = corpus / sipStep5;
+
+        // Step 5: Calculate required lumpsum (using MONTHLY compounding, same as SIP)
+        // Formula: corpus = lumpsum * (1+monthly_rate)^months
+        const reqLump = corpus / sipStep2;
+
+        // Update outputs
+        retireCorpusEl.textContent = formatCurrency(corpus);
+        reqSIPEl.textContent = "₹" + formatCurrency(reqSIP);
+        reqLumpEl.textContent = "₹" + formatCurrency(reqLump);
+
+        // Update chart
+        updateGraph(expNow, expRetire);
+
+        // Handle existing investments
+        const exLump = parseFloat(existingLump.value) || 0;
+        const exSIP = parseFloat(existingSIP.value) || 0;
+        const exRate = (parseFloat(existingRate.value) || 12) / 100;
+
+        if (exLump > 0 || exSIP > 0) {
+          // Calculate FV of existing lumpsum (using MONTHLY compounding to match main calculation)
+          const exLumpMonthlyRate = exRate / 12;
+          const exLumpFV =
+            exLump * Math.pow(1 + exLumpMonthlyRate, monthsToRetire);
+
+          // Calculate FV of existing SIP (using MONTHLY compounding)
+          const exMonthlyRate = exRate / 12;
+          const exStep1 = 1 + exMonthlyRate;
+          const exStep2 = Math.pow(exStep1, monthsToRetire);
+          const exStep3 = exStep2 - 1;
+          const exStep4 = exStep3 / exMonthlyRate;
+          const exStep5 = exStep4 * exStep1;
+          const exSIPFV = exSIP * exStep5;
+
+          // Total FV from existing investments
+          const totalExFV = exLumpFV + exSIPFV;
+
+          // Revised corpus required
+          const revisedCorpus = Math.max(0, corpus - totalExFV);
+
+          // Revised SIP and Lumpsum (using same formulas as original)
+          const revSIP = revisedCorpus / sipStep5;
+          const revLump = revisedCorpus / sipStep2;
+
+          // Update revised outputs
+          revCorpusEl.textContent = "₹" + formatCurrency(revisedCorpus);
+          revSIPEl.textContent = "₹" + formatCurrency(revSIP);
+          revLumpEl.textContent = "₹" + formatCurrency(revLump);
+          revisedSection.style.display = "block";
+        } else {
+          revisedSection.style.display = "none";
+        }
+      }
+
+      // Event listeners for all inputs
+      currentAgeRange.addEventListener("input", function () {
+        currentAge.value = this.value;
+        calculate();
       });
+      currentAge.addEventListener("input", function () {
+        currentAgeRange.value = this.value;
+        calculate();
+      });
+      retireAgeRange.addEventListener("input", function () {
+        retireAge.value = this.value;
+        calculate();
+      });
+      retireAge.addEventListener("input", function () {
+        retireAgeRange.value = this.value;
+        calculate();
+      });
+      lifeExpectRange.addEventListener("input", function () {
+        lifeExpect.value = this.value;
+        calculate();
+      });
+      lifeExpect.addEventListener("input", function () {
+        lifeExpectRange.value = this.value;
+        calculate();
+      });
+      monthlyExpRange.addEventListener("input", function () {
+        monthlyExp.value = this.value;
+        calculate();
+      });
+      monthlyExp.addEventListener("input", function () {
+        monthlyExpRange.value = this.value;
+        calculate();
+      });
+      rateReturnRange.addEventListener("input", function () {
+        rateReturn.value = this.value;
+        calculate();
+      });
+      rateReturn.addEventListener("input", function () {
+        rateReturnRange.value = this.value;
+        calculate();
+      });
+      existingLump.addEventListener("input", calculate);
+      existingSIP.addEventListener("input", calculate);
+      existingRate.addEventListener("input", calculate);
 
-      [currentAge, retireAge, expense, inflation, returnRate, savings].forEach(
-        (el) => el.addEventListener("input", calculate),
-      );
-
+      // Initial calculation
       calculate();
-    </script>
-  </body>
-</html>
+    }
+  })();
+</script>
