@@ -1,18 +1,18 @@
-<!-- PPF CALCULATOR - WordPress Ready -->
-<section id="ppf-calc">
+<!-- SUKANYA SAMRIDDHI YOJANA CALCULATOR - WordPress Ready -->
+<section id="ssy-calc">
   <style>
-    #ppf-calc * {
+    #ssy-calc * {
       font-family:
         Inter,
         -apple-system,
         sans-serif;
       box-sizing: border-box;
     }
-    #ppf-calc {
+    #ssy-calc {
       padding: 40px 20px;
       background: #f9f9f9;
     }
-    .ppf-card {
+    .ssy-card {
       max-width: 1200px;
       margin: auto;
       background: #fff;
@@ -23,11 +23,11 @@
       gap: 50px;
       border: 1px solid #e9e9e9;
     }
-    .ppf-left {
+    .ssy-left {
       position: relative;
       padding-right: 40px;
     }
-    .ppf-left::after {
+    .ssy-left::after {
       content: "";
       position: absolute;
       top: 0;
@@ -36,7 +36,7 @@
       height: 100%;
       background: #e5e5e5;
     }
-    .ppf-right {
+    .ssy-right {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -74,6 +74,7 @@
       border-radius: 12px;
       margin-bottom: 30px;
       text-align: center;
+      border: 1px solid #f2c94c;
     }
     .field {
       margin-bottom: 24px;
@@ -154,12 +155,12 @@
     .info-message.show {
       display: block;
     }
-    .ppf-right h4 {
+    .ssy-right h4 {
       color: #666;
       margin: 0 0 8px 0;
       font-size: 16px;
     }
-    .ppf-right h1 {
+    .ssy-right h1 {
       font-size: 36px;
       margin: 0 0 24px 0;
       color: #000;
@@ -215,10 +216,14 @@
       margin-top: 24px;
       width: 220px;
     }
-    .section-divider {
-      margin: 30px 0;
-      border: none;
-      border-top: 2px solid #e5e5e5;
+    .rate-notice {
+      background: #fff1f7;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #d63a8d;
+      margin-top: 8px;
+      border: 1px solid #f2c94c;
     }
     .info-cards {
       max-width: 1200px;
@@ -243,25 +248,16 @@
       line-height: 1.6;
       margin: 0;
     }
-    .rate-notice {
-      background: #fff1f7;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      color: #d63a8d;
-      margin-top: 8px;
-      border: 1px solid #f2c94c;
-    }
     @media (max-width: 768px) {
-      .ppf-card {
+      .ssy-card {
         grid-template-columns: 1fr;
         padding: 24px 20px;
         gap: 30px;
       }
-      .ppf-left::after {
+      .ssy-left::after {
         display: none;
       }
-      .ppf-left {
+      .ssy-left {
         padding-right: 0;
       }
       .header {
@@ -278,15 +274,17 @@
     }
   </style>
 
-  <div class="ppf-card">
-    <div class="ppf-left">
+  <div class="ssy-card">
+    <div class="ssy-left">
       <div class="header">
-        <h2>PPF Calculator</h2>
+        <h2>Sukanya Samriddhi Yojana Calculator</h2>
         <a href="https://lxme.in" class="btn-primary" target="_blank"
           >Invest Now</a
         >
       </div>
-      <div class="tip-box">💡 PPF gives triple tax benefits — EEE!</div>
+      <div class="tip-box">
+        💡 SSY - Secure your daughter's future with high returns!
+      </div>
 
       <div class="field">
         <div class="label-row">
@@ -296,8 +294,8 @@
             <input
               type="number"
               id="yearlyInvest"
-              value="150000"
-              min="500"
+              value="10000"
+              min="250"
               max="150000"
             />
           </div>
@@ -305,12 +303,12 @@
         <input
           type="range"
           id="yearlyInvestRange"
-          min="500"
+          min="250"
           max="150000"
-          step="500"
-          value="150000"
+          step="250"
+          value="10000"
         />
-        <div class="minmax"><span>₹500</span><span>₹1,50,000</span></div>
+        <div class="minmax"><span>₹250</span><span>₹1,50,000</span></div>
       </div>
 
       <div class="field">
@@ -339,8 +337,8 @@
             <input
               type="number"
               id="rateInterest"
-              value="7.1"
-              min="5"
+              value="8.2"
+              min="7"
               max="10"
               step="0.1"
             />
@@ -351,29 +349,48 @@
           The interest rate is revised by the government every quarter. This is
           as of October-December 2024 quarter.
         </div>
-        <div class="rate-notice">Fixed for now (Current: 7.1%)</div>
+        <div class="rate-notice">Fixed for now (Current: 8.2%)</div>
       </div>
 
       <div class="field">
         <div class="label-row">
-          <label>Time Period (in years)</label>
+          <label>Investment Time Period (in years)</label>
           <div class="input-box">
-            <input type="number" id="timePeriod" value="15" min="15" max="50" />
+            <input
+              type="number"
+              id="investPeriod"
+              value="15"
+              min="1"
+              max="15"
+            />
             Years
           </div>
         </div>
-        <input type="range" id="timePeriodRange" min="15" max="50" value="15" />
-        <div class="minmax"><span>15 Years</span><span>50 Years</span></div>
-        <div class="rate-notice">Fixed for now (Minimum: 15 years)</div>
+        <div class="rate-notice">Fixed (Maximum: 15 years for deposits)</div>
+      </div>
+
+      <div class="field">
+        <div class="label-row">
+          <label>Start Year</label>
+          <div class="input-box">
+            <input
+              type="number"
+              id="startYear"
+              value="2019"
+              min="2015"
+              max="2030"
+            />
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="ppf-right">
-      <h4>Maturity Value</h4>
-      <h1>₹ <span id="maturityValue">0</span></h1>
+    <div class="ssy-right">
+      <h4>Maturity Amount</h4>
+      <h1>₹ <span id="maturityAmount">0</span></h1>
 
       <div class="chart-container">
-        <canvas id="ppfChart"></canvas>
+        <canvas id="ssyChart"></canvas>
       </div>
 
       <div class="chart-legend">
@@ -391,6 +408,11 @@
         <strong id="estInterest">₹0</strong>
       </div>
 
+      <div class="output-box">
+        <span>Maturity Year</span>
+        <strong id="maturityYear">2040</strong>
+      </div>
+
       <a href="https://lxme.in" class="btn-primary big" target="_blank"
         >Start Investing</a
       >
@@ -401,15 +423,15 @@
     <div class="info-card">
       <h3>Did You Know?</h3>
       <p>
-        PPF gives you triple tax benefits — EEE: Tax deduction on contributions,
-        tax-free interest, and tax-free maturity!
+        SSY is the investment scheme specifically designed for girl child by
+        government under "Beti Bachao, Beti Padhao" campaign.
       </p>
     </div>
     <div class="info-card">
       <h3>Nudge:</h3>
       <p>
-        Don't Let Inflation Eat Away Your Wealth — Diversify! Consider investing
-        in equity mutual funds too for long term.
+        A secure future needs both stability and growth—pair your SSY savings
+        with equity mutual funds to achieve both.
       </p>
     </div>
   </div>
@@ -431,17 +453,18 @@
       const yearlyInvest = document.getElementById("yearlyInvest");
       const yearlyInvestRange = document.getElementById("yearlyInvestRange");
       const rateInterest = document.getElementById("rateInterest");
-      const timePeriod = document.getElementById("timePeriod");
-      const timePeriodRange = document.getElementById("timePeriodRange");
+      const investPeriod = document.getElementById("investPeriod");
+      const startYear = document.getElementById("startYear");
 
       // Outputs
-      const maturityValueEl = document.getElementById("maturityValue");
+      const maturityAmountEl = document.getElementById("maturityAmount");
       const amountInvestedEl = document.getElementById("amountInvested");
       const estInterestEl = document.getElementById("estInterest");
+      const maturityYearEl = document.getElementById("maturityYear");
 
       // Chart
-      const ctx = document.getElementById("ppfChart");
-      let ppfChart = null;
+      const ctx = document.getElementById("ssyChart");
+      let ssyChart = null;
 
       // Info button
       document
@@ -457,11 +480,11 @@
       }
 
       function updateChart(invested, interest) {
-        if (ppfChart) {
-          ppfChart.destroy();
+        if (ssyChart) {
+          ssyChart.destroy();
         }
 
-        ppfChart = new Chart(ctx, {
+        ssyChart = new Chart(ctx, {
           type: "doughnut",
           data: {
             labels: ["Amount Invested", "Est. Interest"],
@@ -510,26 +533,39 @@
       }
 
       function calculate() {
-        const yearly = parseFloat(yearlyInvest.value) || 150000;
-        const rate = (parseFloat(rateInterest.value) || 7.1) / 100;
-        const years = parseFloat(timePeriod.value) || 15;
+        const yearly = parseFloat(yearlyInvest.value) || 10000;
+        const rate = (parseFloat(rateInterest.value) || 8.2) / 100;
+        const investYears = parseFloat(investPeriod.value) || 15;
+        const start = parseFloat(startYear.value) || 2019;
 
-        // Calculate maturity value using compound interest formula
-        // M = P × [((1 + r)^n - 1) / r] × (1 + r)
+        // SSY matures after 21 years from opening
+        const maturityPeriod = 21;
+        const maturityYr = start + maturityPeriod;
+
+        // Calculate value after investment period (15 years)
+        // Using compound interest formula for yearly deposits
         const step1 = 1 + rate;
-        const step2 = Math.pow(step1, years);
+        const step2 = Math.pow(step1, investYears);
         const step3 = step2 - 1;
         const step4 = step3 / rate;
         const step5 = step4 * step1;
-        const maturity = yearly * step5;
+        const valueAfter15Years = yearly * step5;
 
-        const totalInvested = yearly * years;
-        const totalInterest = maturity - totalInvested;
+        // Calculate interest earned during investment period
+        const totalInvested = yearly * investYears;
+
+        // After 15 years, no more deposits but continues to earn interest till maturity (21 years)
+        const remainingYears = maturityPeriod - investYears; // 6 years
+        const maturityAmount =
+          valueAfter15Years * Math.pow(1 + rate, remainingYears);
+
+        const totalInterest = maturityAmount - totalInvested;
 
         // Update outputs
-        maturityValueEl.textContent = formatCurrency(maturity);
+        maturityAmountEl.textContent = formatCurrency(maturityAmount);
         amountInvestedEl.textContent = "₹" + formatCurrency(totalInvested);
         estInterestEl.textContent = "₹" + formatCurrency(totalInterest);
+        maturityYearEl.textContent = maturityYr.toString();
 
         // Update chart
         updateChart(totalInvested, totalInterest);
@@ -545,14 +581,8 @@
         calculate();
       });
       rateInterest.addEventListener("input", calculate);
-      timePeriodRange.addEventListener("input", function () {
-        timePeriod.value = this.value;
-        calculate();
-      });
-      timePeriod.addEventListener("input", function () {
-        timePeriodRange.value = this.value;
-        calculate();
-      });
+      investPeriod.addEventListener("input", calculate);
+      startYear.addEventListener("input", calculate);
 
       // Initial calculation
       calculate();
