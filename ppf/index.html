@@ -1,231 +1,561 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PPF Calculator</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-      body {
-        font-family: "Segoe UI", sans-serif;
-        background: #f4f4f4;
-        padding: 40px;
+<!-- PPF CALCULATOR - WordPress Ready -->
+<section id="ppf-calc">
+  <style>
+    #ppf-calc * {
+      font-family:
+        Inter,
+        -apple-system,
+        sans-serif;
+      box-sizing: border-box;
+    }
+    #ppf-calc {
+      padding: 40px 20px;
+      background: #f9f9f9;
+    }
+    .ppf-card {
+      max-width: 1200px;
+      margin: auto;
+      background: #fff;
+      border-radius: 24px;
+      padding: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      border: 1px solid #e9e9e9;
+    }
+    .ppf-left {
+      position: relative;
+      padding-right: 40px;
+    }
+    .ppf-left::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: -25px;
+      width: 1px;
+      height: 100%;
+      background: #e5e5e5;
+    }
+    .ppf-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .header h2 {
+      margin: 0;
+      font-size: 28px;
+      color: #333;
+    }
+    .btn-primary {
+      background: #d63a8d;
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 30px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover {
+      background: #c02e7a;
+    }
+    .tip-box {
+      background: #fff7e6;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .field {
+      margin-bottom: 24px;
+    }
+    .field label {
+      display: block;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .label-row label {
+      margin: 0;
+      flex: 1;
+    }
+    .input-box {
+      background: #fff1f7;
+      padding: 6px 14px;
+      border-radius: 8px;
+      color: #d63a8d;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .input-box input {
+      width: 90px;
+      border: none;
+      background: transparent;
+      text-align: right;
+      font-weight: 600;
+      outline: none;
+      color: #d63a8d;
+      font-size: 15px;
+    }
+    input[type="range"] {
+      width: 100%;
+      margin-top: 10px;
+      accent-color: #d63a8d;
+      cursor: pointer;
+    }
+    .minmax {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-top: 6px;
+      color: #666;
+    }
+    .info-btn {
+      background: none;
+      border: none;
+      color: #d63a8d;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 6px;
+      display: inline-flex;
+      transition: transform 0.2s;
+    }
+    .info-btn:hover {
+      transform: scale(1.1);
+    }
+    .info-message {
+      background: #fff7e6;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #f2b705;
+      border: 1px solid #f2c94c;
+      display: none;
+    }
+    .info-message.show {
+      display: block;
+    }
+    .ppf-right h4 {
+      color: #666;
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    .ppf-right h1 {
+      font-size: 36px;
+      margin: 0 0 24px 0;
+      color: #000;
+    }
+    .chart-container {
+      width: 100%;
+      max-width: 350px;
+      height: 350px;
+      margin: 20px auto;
+      position: relative;
+    }
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #444;
+    }
+    .chart-legend .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .chart-legend .yellow {
+      background: #f2c94c;
+    }
+    .chart-legend .pink {
+      background: #d63a8d;
+    }
+    .output-box {
+      width: 100%;
+      background: #f7f7f7;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-box span {
+      font-size: 14px;
+      color: #666;
+    }
+    .output-box strong {
+      font-size: 18px;
+      color: #d63a8d;
+    }
+    .big {
+      margin-top: 24px;
+      width: 220px;
+    }
+    .section-divider {
+      margin: 30px 0;
+      border: none;
+      border-top: 2px solid #e5e5e5;
+    }
+    .info-cards {
+      max-width: 1200px;
+      margin: 40px auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .info-card {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid #e9e9e9;
+    }
+    .info-card h3 {
+      font-size: 20px;
+      color: #d63a8d;
+      margin: 0 0 12px 0;
+    }
+    .info-card p {
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .rate-notice {
+      background: #fff1f7;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #d63a8d;
+      margin-top: 8px;
+      border: 1px solid #f2c94c;
+    }
+    @media (max-width: 768px) {
+      .ppf-card {
+        grid-template-columns: 1fr;
+        padding: 24px 20px;
+        gap: 30px;
       }
-
-      .container {
-        max-width: 1100px;
-        margin: auto;
-        background: #fff;
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      .ppf-left::after {
+        display: none;
       }
-
-      .wrapper {
-        display: flex;
-        gap: 40px;
-        position: relative;
+      .ppf-left {
+        padding-right: 0;
       }
-
-      .wrapper::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 0;
-        bottom: 0;
-        border-left: 1px solid #e2e2e2;
+      .header {
+        flex-direction: column;
+        gap: 16px;
       }
-
-      .left,
-      .right {
-        flex: 1;
-        padding: 0 20px;
+      .info-cards {
+        grid-template-columns: 1fr;
       }
-
-      h2 {
-        margin-bottom: 20px;
+      .chart-container {
+        max-width: 300px;
+        height: 300px;
       }
+    }
+  </style>
 
-      .label {
-        font-weight: 600;
-        margin-top: 25px;
-      }
+  <div class="ppf-card">
+    <div class="ppf-left">
+      <div class="header">
+        <h2>PPF Calculator</h2>
+        <a href="https://lxme.in" class="btn-primary" target="_blank"
+          >Invest Now</a
+        >
+      </div>
+      <div class="tip-box">💡 PPF gives triple tax benefits — EEE!</div>
 
-      .value-box {
-        float: right;
-        background: #f5eef2;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 600;
-        color: #f30082;
-      }
-
-      input[type="range"] {
-        width: 100%;
-        accent-color: #f30082;
-        margin-top: 10px;
-      }
-
-      .summary {
-        text-align: center;
-      }
-
-      .big-amount {
-        font-size: 32px;
-        font-weight: bold;
-        margin: 10px 0 20px;
-      }
-
-      .summary-box {
-        background: #f5f5f5;
-        padding: 15px;
-        border-radius: 10px;
-        margin-top: 15px;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .yellow {
-        color: #e3b23c;
-        font-weight: bold;
-      }
-      .pink {
-        color: #f30082;
-        font-weight: bold;
-      }
-
-      canvas {
-        max-width: 320px;
-        margin: auto;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="wrapper">
-        <div class="left">
-          <h2>PPF Calculator</h2>
-
-          <div class="label">
-            Yearly Investment
-            <span class="value-box" id="investmentVal">₹ 1,00,000</span>
+      <div class="field">
+        <div class="label-row">
+          <label>Yearly Investment Amount</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="yearlyInvest"
+              value="150000"
+              min="500"
+              max="150000"
+            />
           </div>
-          <input
-            type="range"
-            id="investment"
-            min="500"
-            max="150000"
-            step="500"
-            value="100000"
-          />
-
-          <div class="label">
-            Interest Rate (%)
-            <span class="value-box" id="rateVal">7.1%</span>
-          </div>
-          <input
-            type="range"
-            id="rate"
-            min="1"
-            max="12"
-            step="0.1"
-            value="7.1"
-          />
-
-          <div class="label">
-            Investment Period (Years)
-            <span class="value-box" id="yearsVal">15</span>
-          </div>
-          <input type="range" id="years" min="15" max="30" value="15" />
         </div>
+        <input
+          type="range"
+          id="yearlyInvestRange"
+          min="500"
+          max="150000"
+          step="500"
+          value="150000"
+        />
+        <div class="minmax"><span>₹500</span><span>₹1,50,000</span></div>
+      </div>
 
-        <div class="right">
-          <div class="summary">
-            <div>Maturity Amount</div>
-            <div class="big-amount" id="maturity">₹ 27,12,139</div>
-
-            <canvas id="chart"></canvas>
-
-            <div class="summary-box">
-              <span>Total Invested</span>
-              <span class="yellow" id="invested">₹ 15,00,000</span>
-            </div>
-
-            <div class="summary-box">
-              <span>Total Interest Earned</span>
-              <span class="pink" id="interest">₹ 12,12,139</span>
-            </div>
+      <div class="field">
+        <div class="label-row">
+          <label>
+            Rate of Interest
+            <button class="info-btn" id="rateInfoBtn" type="button">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="7"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M8 7V11M8 5V5.5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </label>
+          <div class="input-box">
+            <input
+              type="number"
+              id="rateInterest"
+              value="7.1"
+              min="5"
+              max="10"
+              step="0.1"
+            />
+            %
           </div>
         </div>
+        <div class="info-message" id="rateInfoMessage">
+          The interest rate is revised by the government every quarter. This is
+          as of October-December 2024 quarter.
+        </div>
+        <div class="rate-notice">Fixed for now (Current: 7.1%)</div>
+      </div>
+
+      <div class="field">
+        <div class="label-row">
+          <label>Time Period (in years)</label>
+          <div class="input-box">
+            <input type="number" id="timePeriod" value="15" min="15" max="50" />
+            Years
+          </div>
+        </div>
+        <input type="range" id="timePeriodRange" min="15" max="50" value="15" />
+        <div class="minmax"><span>15 Years</span><span>50 Years</span></div>
+        <div class="rate-notice">Fixed for now (Minimum: 15 years)</div>
       </div>
     </div>
 
-    <script>
-      const investmentInput = document.getElementById("investment");
-      const rateInput = document.getElementById("rate");
-      const yearsInput = document.getElementById("years");
+    <div class="ppf-right">
+      <h4>Maturity Value</h4>
+      <h1>₹ <span id="maturityValue">0</span></h1>
 
-      function format(num) {
-        return num.toLocaleString("en-IN");
+      <div class="chart-container">
+        <canvas id="ppfChart"></canvas>
+      </div>
+
+      <div class="chart-legend">
+        <span><span class="dot yellow"></span> Amount Invested</span>
+        <span><span class="dot pink"></span> Est. Interest</span>
+      </div>
+
+      <div class="output-box">
+        <span>Amount Invested</span>
+        <strong id="amountInvested">₹0</strong>
+      </div>
+
+      <div class="output-box">
+        <span>Est. Interest</span>
+        <strong id="estInterest">₹0</strong>
+      </div>
+
+      <a href="https://lxme.in" class="btn-primary big" target="_blank"
+        >Start Investing</a
+      >
+    </div>
+  </div>
+
+  <div class="info-cards">
+    <div class="info-card">
+      <h3>Did You Know?</h3>
+      <p>
+        PPF gives you triple tax benefits — EEE: Tax deduction on contributions,
+        tax-free interest, and tax-free maturity!
+      </p>
+    </div>
+    <div class="info-card">
+      <h3>Nudge:</h3>
+      <p>
+        Don't Let Inflation Eat Away Your Wealth — Diversify! Consider investing
+        in equity mutual funds too for long term.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  (function () {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+
+    function init() {
+      // Inputs
+      const yearlyInvest = document.getElementById("yearlyInvest");
+      const yearlyInvestRange = document.getElementById("yearlyInvestRange");
+      const rateInterest = document.getElementById("rateInterest");
+      const timePeriod = document.getElementById("timePeriod");
+      const timePeriodRange = document.getElementById("timePeriodRange");
+
+      // Outputs
+      const maturityValueEl = document.getElementById("maturityValue");
+      const amountInvestedEl = document.getElementById("amountInvested");
+      const estInterestEl = document.getElementById("estInterest");
+
+      // Chart
+      const ctx = document.getElementById("ppfChart");
+      let ppfChart = null;
+
+      // Info button
+      document
+        .getElementById("rateInfoBtn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document.getElementById("rateInfoMessage").classList.toggle("show");
+        });
+
+      function formatCurrency(num) {
+        if (isNaN(num) || !isFinite(num)) return "0";
+        return Math.round(num).toLocaleString("en-IN");
+      }
+
+      function updateChart(invested, interest) {
+        if (ppfChart) {
+          ppfChart.destroy();
+        }
+
+        ppfChart = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: ["Amount Invested", "Est. Interest"],
+            datasets: [
+              {
+                data: [invested, interest],
+                backgroundColor: ["#f2c94c", "#d63a8d"],
+                borderWidth: 0,
+                cutout: "70%",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                padding: 12,
+                callbacks: {
+                  label: function (context) {
+                    const label = context.label || "";
+                    const value = context.parsed || 0;
+                    const total = context.dataset.data.reduce(
+                      (a, b) => a + b,
+                      0,
+                    );
+                    const percentage = ((value / total) * 100).toFixed(1);
+                    return (
+                      label +
+                      ": ₹" +
+                      value.toLocaleString("en-IN") +
+                      " (" +
+                      percentage +
+                      "%)"
+                    );
+                  },
+                },
+              },
+            },
+          },
+        });
       }
 
       function calculate() {
-        const P = parseFloat(investmentInput.value);
-        const r = parseFloat(rateInput.value) / 100;
-        const n = parseInt(yearsInput.value);
+        const yearly = parseFloat(yearlyInvest.value) || 150000;
+        const rate = (parseFloat(rateInterest.value) || 7.1) / 100;
+        const years = parseFloat(timePeriod.value) || 15;
 
-        // PPF formula (start of year investment)
-        const maturity = P * (((Math.pow(1 + r, n) - 1) / r) * (1 + r));
-        const totalInvested = P * n;
-        const interestEarned = maturity - totalInvested;
+        // Calculate maturity value using compound interest formula
+        // M = P × [((1 + r)^n - 1) / r] × (1 + r)
+        const step1 = 1 + rate;
+        const step2 = Math.pow(step1, years);
+        const step3 = step2 - 1;
+        const step4 = step3 / rate;
+        const step5 = step4 * step1;
+        const maturity = yearly * step5;
 
-        document.getElementById("investmentVal").innerText = "₹ " + format(P);
+        const totalInvested = yearly * years;
+        const totalInterest = maturity - totalInvested;
 
-        document.getElementById("rateVal").innerText = rateInput.value + "%";
+        // Update outputs
+        maturityValueEl.textContent = formatCurrency(maturity);
+        amountInvestedEl.textContent = "₹" + formatCurrency(totalInvested);
+        estInterestEl.textContent = "₹" + formatCurrency(totalInterest);
 
-        document.getElementById("yearsVal").innerText = n;
-
-        document.getElementById("maturity").innerText =
-          "₹ " + format(Math.round(maturity));
-
-        document.getElementById("invested").innerText =
-          "₹ " + format(totalInvested);
-
-        document.getElementById("interest").innerText =
-          "₹ " + format(Math.round(interestEarned));
-
-        chart.data.datasets[0].data = [
-          totalInvested,
-          Math.round(interestEarned),
-        ];
-        chart.update();
+        // Update chart
+        updateChart(totalInvested, totalInterest);
       }
 
-      const ctx = document.getElementById("chart");
-
-      const chart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-          labels: ["Total Invested", "Total Interest"],
-          datasets: [
-            {
-              data: [1500000, 1212139],
-              backgroundColor: ["#e3b23c", "#F30082"],
-            },
-          ],
-        },
-        options: {
-          plugins: { legend: { position: "top" } },
-          cutout: "65%",
-        },
+      // Event listeners
+      yearlyInvestRange.addEventListener("input", function () {
+        yearlyInvest.value = this.value;
+        calculate();
+      });
+      yearlyInvest.addEventListener("input", function () {
+        yearlyInvestRange.value = this.value;
+        calculate();
+      });
+      rateInterest.addEventListener("input", calculate);
+      timePeriodRange.addEventListener("input", function () {
+        timePeriod.value = this.value;
+        calculate();
+      });
+      timePeriod.addEventListener("input", function () {
+        timePeriodRange.value = this.value;
+        calculate();
       });
 
-      [investmentInput, rateInput, yearsInput].forEach((el) =>
-        el.addEventListener("input", calculate),
-      );
-
+      // Initial calculation
       calculate();
-    </script>
-  </body>
-</html>
+    }
+  })();
+</script>
