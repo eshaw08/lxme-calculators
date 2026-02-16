@@ -1,255 +1,655 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Goal Calculator</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-      body {
-        font-family: "Segoe UI", sans-serif;
-        background: #f4f4f4;
-        padding: 40px;
+<!-- GOAL CALCULATOR - WordPress Ready -->
+<section id="goal-calc">
+  <style>
+    #goal-calc * {
+      font-family:
+        Inter,
+        -apple-system,
+        sans-serif;
+      box-sizing: border-box;
+    }
+    #goal-calc {
+      padding: 40px 20px;
+      background: #f9f9f9;
+    }
+    .goal-card {
+      max-width: 1200px;
+      margin: auto;
+      background: #fff;
+      border-radius: 24px;
+      padding: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      border: 1px solid #e9e9e9;
+    }
+    .goal-left {
+      position: relative;
+      padding-right: 40px;
+    }
+    .goal-left::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: -25px;
+      width: 1px;
+      height: 100%;
+      background: #e5e5e5;
+    }
+    .goal-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .header h2 {
+      margin: 0;
+      font-size: 28px;
+      color: #333;
+    }
+    .btn-primary {
+      background: #d63a8d;
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: 30px;
+      border: none;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(214, 58, 141, 0.3);
+      white-space: nowrap;
+    }
+    .btn-primary:hover {
+      background: #c02e7a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(214, 58, 141, 0.4);
+    }
+    .tip-box {
+      background: #fff7e6;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+      border: 1px solid #f2c94c;
+    }
+    .mode-toggle {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+    .mode-toggle button {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #e5e5e5;
+      background: #fff;
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .mode-toggle button.active {
+      background: #d63a8d;
+      color: #fff;
+      border-color: #d63a8d;
+    }
+    .mode-toggle button:hover:not(.active) {
+      border-color: #d63a8d;
+      color: #d63a8d;
+    }
+    .field {
+      margin-bottom: 24px;
+    }
+    .field label {
+      display: block;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .label-row label {
+      margin: 0;
+      flex: 1;
+    }
+    .input-box {
+      background: #fff1f7;
+      padding: 6px 14px;
+      border-radius: 8px;
+      color: #d63a8d;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .input-box input {
+      width: 90px;
+      border: none;
+      background: transparent;
+      text-align: right;
+      font-weight: 600;
+      outline: none;
+      color: #d63a8d;
+      font-size: 15px;
+    }
+    input[type="range"] {
+      width: 100%;
+      margin-top: 10px;
+      accent-color: #d63a8d;
+      cursor: pointer;
+    }
+    .minmax {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-top: 6px;
+      color: #666;
+    }
+    .info-btn {
+      background: none;
+      border: none;
+      color: #d63a8d;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 6px;
+      display: inline-flex;
+      transition: transform 0.2s;
+    }
+    .info-btn:hover {
+      transform: scale(1.1);
+    }
+    .info-message {
+      background: #e8f5e9;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #2e7d32;
+      border: 1px solid #81c784;
+      display: none;
+    }
+    .info-message.show {
+      display: block;
+    }
+    .goal-right h4 {
+      color: #666;
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    .goal-right h1 {
+      font-size: 36px;
+      margin: 0 0 24px 0;
+      color: #000;
+    }
+    .chart-container {
+      width: 100%;
+      max-width: 350px;
+      height: 350px;
+      margin: 20px auto;
+      position: relative;
+    }
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #444;
+    }
+    .chart-legend .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .chart-legend .yellow {
+      background: #f2c94c;
+    }
+    .chart-legend .pink {
+      background: #d63a8d;
+    }
+    .output-box {
+      width: 100%;
+      background: #f7f7f7;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-box span {
+      font-size: 14px;
+      color: #666;
+    }
+    .output-box strong {
+      font-size: 18px;
+      color: #d63a8d;
+    }
+    .big {
+      margin-top: 24px;
+      width: 220px;
+    }
+    .inflation-note {
+      background: #fff7e6;
+      padding: 14px 16px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #f2c94c;
+    }
+    .inflation-note span {
+      color: #666;
+      font-size: 14px;
+    }
+    .inflation-note strong {
+      color: #f2b705;
+      font-size: 16px;
+    }
+    .info-cards {
+      max-width: 1200px;
+      margin: 40px auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .info-card {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid #e9e9e9;
+    }
+    .info-card h3 {
+      font-size: 20px;
+      color: #d63a8d;
+      margin: 0 0 12px 0;
+    }
+    .info-card p {
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+    @media (max-width: 768px) {
+      .goal-card {
+        grid-template-columns: 1fr;
+        padding: 24px 20px;
+        gap: 30px;
       }
-
-      .container {
-        max-width: 1100px;
-        margin: auto;
-        background: #fff;
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      .goal-left::after {
+        display: none;
       }
-
-      .wrapper {
-        display: flex;
-        gap: 40px;
-        position: relative;
+      .goal-left {
+        padding-right: 0;
       }
-
-      .wrapper::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 0;
-        bottom: 0;
-        border-left: 1px solid #e2e2e2;
+      .header {
+        flex-direction: column;
+        gap: 16px;
       }
-
-      .left,
-      .right {
-        flex: 1;
-        padding: 0 20px;
+      .mode-toggle {
+        flex-direction: column;
       }
-
-      h2 {
-        margin-bottom: 20px;
+      .info-cards {
+        grid-template-columns: 1fr;
       }
-
-      .label {
-        font-weight: 600;
-        margin-top: 25px;
+      .chart-container {
+        max-width: 300px;
+        height: 300px;
       }
+    }
+  </style>
 
-      .value-box {
-        float: right;
-        background: #f5eef2;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 600;
-        color: #f30082;
-      }
+  <div class="goal-card">
+    <div class="goal-left">
+      <div class="header">
+        <h2>Goal Calculator</h2>
+        <a href="https://lxme.in" class="btn-primary" target="_blank"
+          >Invest Now</a
+        >
+      </div>
+      <div class="tip-box">💡 Plan your dreams with precision!</div>
 
-      input[type="range"] {
-        width: 100%;
-        accent-color: #f30082;
-        margin-top: 10px;
-      }
+      <!-- Time Mode Toggle -->
+      <div class="mode-toggle">
+        <button id="yearsModeBtn" class="active">Plan in Years</button>
+        <button id="monthsModeBtn">Plan in Months</button>
+      </div>
 
-      .summary {
-        text-align: center;
-      }
-
-      .big-amount {
-        font-size: 32px;
-        font-weight: bold;
-        margin: 10px 0 20px;
-      }
-
-      .summary-box {
-        background: #f5f5f5;
-        padding: 15px;
-        border-radius: 10px;
-        margin-top: 15px;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .yellow {
-        color: #e3b23c;
-        font-weight: bold;
-      }
-      .pink {
-        color: #f30082;
-        font-weight: bold;
-      }
-
-      canvas {
-        max-width: 320px;
-        margin: auto;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="wrapper">
-        <div class="left">
-          <h2>Goal Calculator</h2>
-
-          <div class="label">
-            Goal Amount (Today)
-            <span class="value-box" id="goalVal">₹ 10,00,000</span>
+      <div class="field">
+        <div class="label-row">
+          <label>Your Goal Amount</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="goalAmount"
+              value="200000"
+              min="1000"
+              max="10000000"
+            />
           </div>
-          <input
-            type="range"
-            id="goal"
-            min="100000"
-            max="10000000"
-            step="50000"
-            value="1000000"
-          />
-
-          <div class="label">
-            Years to Achieve Goal
-            <span class="value-box" id="yearsVal">5</span>
-          </div>
-          <input type="range" id="years" min="1" max="30" value="5" />
-
-          <div class="label">
-            Expected Inflation (%)
-            <span class="value-box" id="inflationVal">6%</span>
-          </div>
-          <input type="range" id="inflation" min="2" max="12" value="6" />
-
-          <div class="label">
-            Expected Return (%)
-            <span class="value-box" id="returnVal">12%</span>
-          </div>
-          <input type="range" id="returnRate" min="5" max="20" value="12" />
-
-          <div class="label">
-            Existing Savings
-            <span class="value-box" id="savingsVal">₹ 2,00,000</span>
-          </div>
-          <input
-            type="range"
-            id="savings"
-            min="0"
-            max="5000000"
-            step="50000"
-            value="200000"
-          />
         </div>
+        <input
+          type="range"
+          id="goalAmountRange"
+          min="1000"
+          max="10000000"
+          step="1000"
+          value="200000"
+        />
+        <div class="minmax"><span>₹1,000</span><span>₹1,00,00,000</span></div>
+      </div>
 
-        <div class="right">
-          <div class="summary">
-            <div>Future Goal Value</div>
-            <div class="big-amount" id="futureGoal">₹ 13,38,000</div>
-
-            <canvas id="chart"></canvas>
-
-            <div class="summary-box">
-              <span>Required Monthly SIP</span>
-              <span class="yellow" id="sipDisplay">₹ 15,000</span>
-            </div>
-
-            <div class="summary-box">
-              <span>Additional Required</span>
-              <span class="pink" id="additionalDisplay">₹ 11,38,000</span>
-            </div>
+      <div class="field">
+        <div class="label-row">
+          <label>Expected Rate of Return</label>
+          <div class="input-box">
+            <input
+              type="number"
+              id="rateReturn"
+              value="14"
+              min="1"
+              max="30"
+              step="0.5"
+            />
+            %
           </div>
         </div>
+        <input
+          type="range"
+          id="rateReturnRange"
+          min="1"
+          max="30"
+          step="0.5"
+          value="14"
+        />
+        <div class="minmax"><span>1%</span><span>30%</span></div>
+      </div>
+
+      <div class="field">
+        <div class="label-row">
+          <label>Time Period of Investment</label>
+          <div class="input-box">
+            <input type="number" id="timePeriod" value="10" min="1" max="30" />
+            <span id="timeUnit">Yrs</span>
+          </div>
+        </div>
+        <input type="range" id="timePeriodRange" min="1" max="30" value="10" />
+        <div class="minmax">
+          <span id="timeMin">1 Year</span>
+          <span id="timeMax">30 Years</span>
+        </div>
+      </div>
+
+      <div class="inflation-note">
+        <span>Assumed Inflation Rate</span>
+        <strong>8% p.a.</strong>
       </div>
     </div>
 
-    <script>
-      const goalInput = document.getElementById("goal");
-      const yearsInput = document.getElementById("years");
-      const inflationInput = document.getElementById("inflation");
-      const returnInput = document.getElementById("returnRate");
-      const savingsInput = document.getElementById("savings");
+    <div class="goal-right">
+      <h4>Revised Goal Amount</h4>
+      <h1>₹ <span id="revisedGoal">0</span></h1>
 
-      function format(num) {
-        return num.toLocaleString("en-IN");
+      <div class="chart-container">
+        <canvas id="goalChart"></canvas>
+      </div>
+
+      <div class="chart-legend">
+        <span><span class="dot yellow"></span> Your Goal Amount</span>
+        <span><span class="dot pink"></span> Inflation Impact</span>
+      </div>
+
+      <div class="output-box">
+        <span>Required SIP</span>
+        <strong id="requiredSIP">₹0</strong>
+      </div>
+
+      <div class="output-box">
+        <span>Required Lumpsum</span>
+        <strong id="requiredLumpsum">₹0</strong>
+      </div>
+
+      <a href="https://lxme.in" class="btn-primary big" target="_blank"
+        >Start Investing</a
+      >
+    </div>
+  </div>
+
+  <div class="info-cards">
+    <div class="info-card">
+      <h3>Nudge:</h3>
+      <p>Invest in your dreams, the time is NOW!</p>
+    </div>
+    <div class="info-card">
+      <h3>Did You Know?</h3>
+      <p>
+        Planning is the secret sauce—without it, your goals are just wishes!
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  (function () {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+
+    function init() {
+      // State
+      let timeMode = "years"; // 'years' or 'months'
+      const INFLATION = 0.08;
+
+      // DOM Elements
+      const yearsModeBtn = document.getElementById("yearsModeBtn");
+      const monthsModeBtn = document.getElementById("monthsModeBtn");
+      const goalAmount = document.getElementById("goalAmount");
+      const goalAmountRange = document.getElementById("goalAmountRange");
+      const rateReturn = document.getElementById("rateReturn");
+      const rateReturnRange = document.getElementById("rateReturnRange");
+      const timePeriod = document.getElementById("timePeriod");
+      const timePeriodRange = document.getElementById("timePeriodRange");
+      const timeUnit = document.getElementById("timeUnit");
+      const timeMin = document.getElementById("timeMin");
+      const timeMax = document.getElementById("timeMax");
+
+      // Outputs
+      const revisedGoalEl = document.getElementById("revisedGoal");
+      const requiredSIPEl = document.getElementById("requiredSIP");
+      const requiredLumpsumEl = document.getElementById("requiredLumpsum");
+
+      // Chart
+      const ctx = document.getElementById("goalChart");
+      let goalChart = null;
+
+      function formatCurrency(num) {
+        if (isNaN(num) || !isFinite(num)) return "0";
+        return Math.round(num).toLocaleString("en-IN");
+      }
+
+      function updateChart(originalGoal, inflationImpact) {
+        if (goalChart) {
+          goalChart.destroy();
+        }
+
+        goalChart = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: ["Your Goal Amount", "Inflation Impact"],
+            datasets: [
+              {
+                data: [originalGoal, inflationImpact],
+                backgroundColor: ["#f2c94c", "#d63a8d"],
+                borderWidth: 0,
+                cutout: "70%",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                padding: 12,
+                callbacks: {
+                  label: function (context) {
+                    const label = context.label || "";
+                    const value = context.parsed || 0;
+                    const total = context.dataset.data.reduce(
+                      (a, b) => a + b,
+                      0,
+                    );
+                    const percentage = ((value / total) * 100).toFixed(1);
+                    return (
+                      label +
+                      ": ₹" +
+                      value.toLocaleString("en-IN") +
+                      " (" +
+                      percentage +
+                      "%)"
+                    );
+                  },
+                },
+              },
+            },
+          },
+        });
       }
 
       function calculate() {
-        const goal = parseFloat(goalInput.value);
-        const years = parseInt(yearsInput.value);
-        const inflation = parseFloat(inflationInput.value) / 100;
-        const returnRate = parseFloat(returnInput.value) / 100;
-        const savings = parseFloat(savingsInput.value);
+        const goal = parseFloat(goalAmount.value) || 200000;
+        const rate = (parseFloat(rateReturn.value) || 14) / 100;
+        const period = parseFloat(timePeriod.value) || 10;
 
-        const futureGoal = goal * Math.pow(1 + inflation, years);
-        const additional = Math.max(futureGoal - savings, 0);
+        let revisedGoal, reqSIP, reqLumpsum, years;
 
-        const months = years * 12;
-        const monthlyRate = returnRate / 12;
+        if (timeMode === "years") {
+          years = period;
+          // Calculate revised goal with inflation
+          revisedGoal = goal * Math.pow(1 + INFLATION, years);
+        } else {
+          // Months mode
+          years = period / 12;
+          revisedGoal = goal * Math.pow(1 + INFLATION, years);
+        }
 
-        const sip =
-          (additional * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
+        const inflationImpact = revisedGoal - goal;
 
-        document.getElementById("goalVal").innerText = "₹ " + format(goal);
-        document.getElementById("yearsVal").innerText = years;
-        document.getElementById("inflationVal").innerText =
-          inflationInput.value + "%";
-        document.getElementById("returnVal").innerText =
-          returnInput.value + "%";
-        document.getElementById("savingsVal").innerText =
-          "₹ " + format(savings);
+        // Calculate SIP (monthly)
+        const monthlyRate = rate / 12;
+        const months = timeMode === "years" ? period * 12 : period;
+        const step1 = 1 + monthlyRate;
+        const step2 = Math.pow(step1, months);
+        const step3 = step2 - 1;
+        const step4 = step3 / monthlyRate;
+        const step5 = step4 * step1;
+        reqSIP = revisedGoal / step5;
 
-        document.getElementById("futureGoal").innerText =
-          "₹ " + format(Math.round(futureGoal));
+        // Calculate lumpsum (using monthly compounding)
+        reqLumpsum = revisedGoal / step2;
 
-        document.getElementById("sipDisplay").innerText =
-          "₹ " + format(Math.round(sip));
+        // Update outputs
+        revisedGoalEl.textContent = formatCurrency(revisedGoal);
+        requiredSIPEl.textContent = "₹" + formatCurrency(reqSIP);
+        requiredLumpsumEl.textContent = "₹" + formatCurrency(reqLumpsum);
 
-        document.getElementById("additionalDisplay").innerText =
-          "₹ " + format(Math.round(additional));
-
-        chart.data.datasets[0].data = [savings, additional];
-        chart.update();
+        // Update chart
+        updateChart(goal, inflationImpact);
       }
 
-      const ctx = document.getElementById("chart");
+      function switchMode(mode) {
+        timeMode = mode;
 
-      const chart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-          labels: ["Existing Savings", "Additional Required"],
-          datasets: [
-            {
-              data: [200000, 1138000],
-              backgroundColor: ["#e3b23c", "#F30082"],
-            },
-          ],
-        },
-        options: {
-          plugins: { legend: { position: "top" } },
-          cutout: "65%",
-        },
+        if (mode === "years") {
+          yearsModeBtn.classList.add("active");
+          monthsModeBtn.classList.remove("active");
+          timePeriod.value = 10;
+          timePeriod.min = 1;
+          timePeriod.max = 30;
+          timePeriodRange.value = 10;
+          timePeriodRange.min = 1;
+          timePeriodRange.max = 30;
+          timeUnit.textContent = "Yrs";
+          timeMin.textContent = "1 Year";
+          timeMax.textContent = "30 Years";
+        } else {
+          monthsModeBtn.classList.add("active");
+          yearsModeBtn.classList.remove("active");
+          timePeriod.value = 120;
+          timePeriod.min = 1;
+          timePeriod.max = 120;
+          timePeriodRange.value = 120;
+          timePeriodRange.min = 1;
+          timePeriodRange.max = 120;
+          timeUnit.textContent = "Mos";
+          timeMin.textContent = "1 Month";
+          timeMax.textContent = "120 Months";
+        }
+
+        calculate();
+      }
+
+      // Event listeners
+      yearsModeBtn.addEventListener("click", function () {
+        switchMode("years");
       });
 
-      [
-        goalInput,
-        yearsInput,
-        inflationInput,
-        returnInput,
-        savingsInput,
-      ].forEach((el) => el.addEventListener("input", calculate));
+      monthsModeBtn.addEventListener("click", function () {
+        switchMode("months");
+      });
 
+      goalAmountRange.addEventListener("input", function () {
+        goalAmount.value = this.value;
+        calculate();
+      });
+      goalAmount.addEventListener("input", function () {
+        goalAmountRange.value = this.value;
+        calculate();
+      });
+      rateReturnRange.addEventListener("input", function () {
+        rateReturn.value = this.value;
+        calculate();
+      });
+      rateReturn.addEventListener("input", function () {
+        rateReturnRange.value = this.value;
+        calculate();
+      });
+      timePeriodRange.addEventListener("input", function () {
+        timePeriod.value = this.value;
+        calculate();
+      });
+      timePeriod.addEventListener("input", function () {
+        timePeriodRange.value = this.value;
+        calculate();
+      });
+
+      // Initial calculation
       calculate();
-    </script>
-  </body>
-</html>
+    }
+  })();
+</script>

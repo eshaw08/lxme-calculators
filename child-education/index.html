@@ -1,268 +1,804 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Child Education Calculator</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-      body {
-        font-family: "Segoe UI", sans-serif;
-        background: #f4f4f4;
-        padding: 40px;
+<!-- CHILD EDUCATION CALCULATOR - WordPress Ready -->
+<section id="child-edu-calc">
+  <style>
+    #child-edu-calc * {
+      font-family:
+        Inter,
+        -apple-system,
+        sans-serif;
+      box-sizing: border-box;
+    }
+    #child-edu-calc {
+      padding: 40px 20px;
+      background: #f9f9f9;
+    }
+    .edu-card {
+      max-width: 1200px;
+      margin: auto;
+      background: #fff;
+      border-radius: 24px;
+      padding: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      border: 1px solid #e9e9e9;
+    }
+    .edu-left {
+      position: relative;
+      padding-right: 40px;
+    }
+    .edu-left::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: -25px;
+      width: 1px;
+      height: 100%;
+      background: #e5e5e5;
+    }
+    .edu-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .header h2 {
+      margin: 0;
+      font-size: 28px;
+      color: #333;
+    }
+    .btn-primary {
+      background: #d63a8d;
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 30px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover {
+      background: #c02e7a;
+    }
+    .tip-box {
+      background: #fff7e6;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .field {
+      margin-bottom: 24px;
+    }
+    .field label {
+      display: block;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .label-row label {
+      margin: 0;
+      flex: 1;
+    }
+    .input-box {
+      background: #fff1f7;
+      padding: 6px 14px;
+      border-radius: 8px;
+      color: #d63a8d;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .input-box input {
+      width: 90px;
+      border: none;
+      background: transparent;
+      text-align: right;
+      font-weight: 600;
+      outline: none;
+      color: #d63a8d;
+      font-size: 15px;
+    }
+    input[type="range"] {
+      width: 100%;
+      margin-top: 10px;
+      accent-color: #d63a8d;
+      cursor: pointer;
+    }
+    .minmax {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-top: 6px;
+      color: #666;
+    }
+    .info-btn {
+      background: none;
+      border: none;
+      color: #d63a8d;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 6px;
+      display: inline-flex;
+      transition: transform 0.2s;
+    }
+    .info-btn:hover {
+      transform: scale(1.1);
+    }
+    .info-message {
+      background: #fff7e6;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #f2b705;
+      border: 1px solid #f2c94c;
+      display: none;
+    }
+    .info-message.show {
+      display: block;
+    }
+    .edu-right h4 {
+      color: #666;
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    .edu-right h1 {
+      font-size: 36px;
+      margin: 0 0 24px 0;
+      color: #000;
+    }
+    .css-donut-chart {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin: 20px auto;
+      border-radius: 50%;
+      background: conic-gradient(
+        #f2c94c 0deg,
+        #f2c94c var(--yellow-angle, 108deg),
+        #d63a8d var(--yellow-angle, 108deg),
+        #d63a8d 360deg
+      );
+      transition: background 0.3s ease;
+    }
+    .css-donut-hole {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 180px;
+      height: 180px;
+      background: white;
+      border-radius: 50%;
+    }
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    .chart-legend .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .chart-legend .yellow {
+      background: #f2c94c;
+    }
+    .chart-legend .pink {
+      background: #d63a8d;
+    }
+    .output-box {
+      width: 100%;
+      background: #f7f7f7;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-box span {
+      font-size: 14px;
+      color: #666;
+    }
+    .output-box strong {
+      font-size: 18px;
+      color: #d63a8d;
+    }
+    .big {
+      margin-top: 24px;
+      width: 220px;
+    }
+    .inflation-note {
+      background: #fff7e6;
+      padding: 14px 16px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .inflation-note span {
+      color: #666;
+      font-size: 14px;
+    }
+    .inflation-note strong {
+      color: #f2b705;
+      font-size: 16px;
+    }
+    .info-cards {
+      max-width: 1200px;
+      margin: 40px auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .info-card {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid #e9e9e9;
+    }
+    .info-card h3 {
+      font-size: 20px;
+      color: #d63a8d;
+      margin: 0 0 12px 0;
+    }
+    .info-card p {
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .growth-table {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 30px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #e9e9e9;
+    }
+    .growth-table h3 {
+      margin: 0 0 20px 0;
+      font-size: 24px;
+      color: #333;
+    }
+    .growth-table table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .growth-table th,
+    .growth-table td {
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid #e9e9e9;
+    }
+    .growth-table th {
+      background: #f7f7f7;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+    .growth-table td {
+      font-size: 15px;
+      color: #666;
+    }
+    .growth-table td:last-child {
+      font-weight: 600;
+      color: #d63a8d;
+    }
+    .growth-table tr.highlight {
+      background: #fff1f7;
+    }
+    .growth-table .cta-text {
+      margin-top: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+    .growth-table .disclaimer {
+      margin-top: 12px;
+      color: #999;
+      font-size: 12px;
+      font-style: italic;
+    }
+    .logic-table {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 30px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #e9e9e9;
+    }
+    .logic-table h3 {
+      margin: 0 0 12px 0;
+      font-size: 24px;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logic-table .note {
+      margin: 0 0 20px 0;
+      color: #999;
+      font-size: 13px;
+      font-style: italic;
+    }
+    .logic-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .logic-table th,
+    .logic-table td {
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid #e9e9e9;
+    }
+    .logic-table th {
+      background: #f7f7f7;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+    .logic-table td {
+      font-size: 15px;
+      color: #666;
+    }
+    .logic-table td:last-child {
+      font-weight: 600;
+      color: #d63a8d;
+    }
+    @media (max-width: 768px) {
+      .edu-card {
+        grid-template-columns: 1fr;
+        padding: 24px 20px;
+        gap: 30px;
       }
-
-      .container {
-        max-width: 1100px;
-        margin: auto;
-        background: #fff;
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      .edu-left::after {
+        display: none;
       }
-
-      .wrapper {
-        display: flex;
-        gap: 40px;
-        position: relative;
+      .edu-left {
+        padding-right: 0;
       }
-
-      .wrapper::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 0;
-        bottom: 0;
-        border-left: 1px solid #e2e2e2;
+      .header {
+        flex-direction: column;
+        gap: 16px;
       }
-
-      .left,
-      .right {
-        flex: 1;
-        padding: 0 20px;
+      .info-cards {
+        grid-template-columns: 1fr;
       }
+    }
+  </style>
 
-      h2 {
-        margin-bottom: 20px;
-      }
+  <div class="edu-card">
+    <div class="edu-left">
+      <div class="header">
+        <h2>Child Education Calculator</h2>
+        <a href="https://lxme.in" class="btn-primary" target="_blank"
+          >Invest Now</a
+        >
+      </div>
+      <div class="tip-box">
+        💡 Plan your child's education today for a stress-free tomorrow!
+      </div>
 
-      .label {
-        font-weight: 600;
-        margin-top: 25px;
-      }
-
-      .value-box {
-        float: right;
-        background: #f5eef2;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 600;
-        color: #f30082;
-      }
-
-      input[type="range"] {
-        width: 100%;
-        accent-color: #f30082;
-        margin-top: 10px;
-      }
-
-      .summary {
-        text-align: center;
-      }
-
-      .big-amount {
-        font-size: 32px;
-        font-weight: bold;
-        margin: 10px 0 20px;
-      }
-
-      .summary-box {
-        background: #f5f5f5;
-        padding: 15px;
-        border-radius: 10px;
-        margin-top: 15px;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .yellow {
-        color: #e3b23c;
-        font-weight: bold;
-      }
-      .pink {
-        color: #f30082;
-        font-weight: bold;
-      }
-
-      canvas {
-        max-width: 320px;
-        margin: auto;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="wrapper">
-        <div class="left">
-          <h2>Child Education Calculator</h2>
-
-          <div class="label">
-            Child's Current Age
-            <span class="value-box" id="ageVal">5</span>
+      <div class="field">
+        <div class="label-row">
+          <label>What's your child's current age?</label>
+          <div class="input-box">
+            <input type="number" id="currentAge" value="1" min="0" max="25" />
+            Years
           </div>
-          <input type="range" id="age" min="0" max="18" value="5" />
-
-          <div class="label">
-            Higher Education Age
-            <span class="value-box" id="eduAgeVal">18</span>
-          </div>
-          <input type="range" id="eduAge" min="16" max="25" value="18" />
-
-          <div class="label">
-            Current Education Cost
-            <span class="value-box" id="costVal">₹ 10,00,000</span>
-          </div>
-          <input
-            type="range"
-            id="cost"
-            min="100000"
-            max="5000000"
-            step="50000"
-            value="1000000"
-          />
-
-          <div class="label">
-            Education Inflation (%)
-            <span class="value-box" id="inflationVal">8%</span>
-          </div>
-          <input type="range" id="inflation" min="5" max="15" value="8" />
-
-          <div class="label">
-            Expected Return (%)
-            <span class="value-box" id="returnVal">12%</span>
-          </div>
-          <input type="range" id="returnRate" min="5" max="20" value="12" />
-
-          <div class="label">
-            Existing Savings
-            <span class="value-box" id="savingsVal">₹ 2,00,000</span>
-          </div>
-          <input
-            type="range"
-            id="savings"
-            min="0"
-            max="5000000"
-            step="50000"
-            value="200000"
-          />
         </div>
+        <input type="range" id="currentAgeRange" min="0" max="25" value="1" />
+        <div class="minmax"><span>0 Years</span><span>25 Years</span></div>
+      </div>
 
-        <div class="right">
-          <div class="summary">
-            <div>Future Education Cost</div>
-            <div class="big-amount" id="futureCost">₹ 27,18,000</div>
-
-            <canvas id="chart"></canvas>
-
-            <div class="summary-box">
-              <span>Required Monthly SIP</span>
-              <span class="yellow" id="sipDisplay">₹ 8,500</span>
-            </div>
-
-            <div class="summary-box">
-              <span>Additional Required</span>
-              <span class="pink" id="additionalDisplay">₹ 25,18,000</span>
-            </div>
+      <div class="field">
+        <div class="label-row">
+          <label>At what age will your child need the funds?</label>
+          <div class="input-box">
+            <input type="number" id="targetAge" value="18" min="3" max="25" />
+            Years
           </div>
         </div>
+        <input type="range" id="targetAgeRange" min="3" max="25" value="18" />
+        <div class="minmax"><span>3 Years</span><span>25 Years</span></div>
+      </div>
+
+      <div class="field">
+        <div class="label-row">
+          <label
+            >Cost of Education (as of today)
+            <button class="info-btn" id="costInfoBtn" type="button">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="7"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M8 7V11M8 5V5.5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="costToday"
+              value="2000000"
+              min="1000"
+              max="20000000"
+            />
+          </div>
+        </div>
+        <div class="info-message" id="costInfoMessage">
+          For example, an MBA in India today can cost around ₹22 lakhs, MBBS ₹50
+          lakhs, Law ₹15 lakhs, Engineering ₹10 lakhs and Arts ₹5 lakhs.
+        </div>
+        <input
+          type="range"
+          id="costTodayRange"
+          min="1000"
+          max="20000000"
+          step="10000"
+          value="2000000"
+        />
+        <div class="minmax"><span>₹1,000</span><span>₹2,00,00,000</span></div>
+      </div>
+
+      <div class="field">
+        <div class="label-row">
+          <label>Expected Rate of Return</label>
+          <div class="input-box">
+            <input
+              type="number"
+              id="rateReturn"
+              value="14"
+              min="1"
+              max="30"
+              step="0.5"
+            />
+            %
+          </div>
+        </div>
+        <input
+          type="range"
+          id="rateReturnRange"
+          min="1"
+          max="30"
+          step="0.5"
+          value="14"
+        />
+        <div class="minmax"><span>1%</span><span>30%</span></div>
+      </div>
+
+      <div class="inflation-note">
+        <span>Assumed Inflation Rate</span>
+        <strong>8% p.a.</strong>
       </div>
     </div>
 
-    <script>
-      const ageInput = document.getElementById("age");
-      const eduAgeInput = document.getElementById("eduAge");
-      const costInput = document.getElementById("cost");
-      const inflationInput = document.getElementById("inflation");
-      const returnInput = document.getElementById("returnRate");
-      const savingsInput = document.getElementById("savings");
+    <div class="edu-right">
+      <h4>Cost of Education at Admission</h4>
+      <h1>₹ <span id="costAtAdmission">0</span></h1>
 
-      function format(num) {
-        return num.toLocaleString("en-IN");
+      <div class="css-donut-chart" id="eduChart">
+        <div class="css-donut-hole"></div>
+      </div>
+
+      <div class="chart-legend">
+        <span><span class="dot yellow"></span> Cost of Education Today</span>
+        <span><span class="dot pink"></span> Cost Increase</span>
+      </div>
+
+      <div class="output-box">
+        <span>Required SIP</span>
+        <strong id="requiredSIP">₹0</strong>
+      </div>
+
+      <div class="output-box">
+        <span>Required Lumpsum</span>
+        <strong id="requiredLumpsum">₹0</strong>
+      </div>
+
+      <a href="https://lxme.in" class="btn-primary big" target="_blank"
+        >Start Investing</a
+      >
+    </div>
+  </div>
+
+  <div class="info-cards">
+    <div class="info-card">
+      <h3>Nudge:</h3>
+      <p>
+        Your child's dreams don't come with a price tag—but their education
+        does! Planning today ensures a stress-free tomorrow!
+      </p>
+    </div>
+    <div class="info-card">
+      <h3>Did You Know?</h3>
+      <p>
+        Education costs in India are rising at a staggering 11–12% annually,
+        doubling every 6–7 years! The key to staying ahead is making smart
+        decisions by investing in inflation-beating options today.
+      </p>
+    </div>
+  </div>
+
+  <div class="logic-table">
+    <h3>
+      Logic for Intuitive and automated expected rate of returns for the time
+      period
+      <button class="info-btn" id="logicInfoBtn" type="button">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle
+            cx="8"
+            cy="8"
+            r="7"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+          <path
+            d="M8 7V11M8 5V5.5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    </h3>
+    <div class="info-message" id="logicInfoMessage">
+      The expected rate of return may vary based on the time period of
+      investment
+    </div>
+    <p class="note">
+      It can be shown as a pre-filled value, but it should still be editable for
+      the user
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Time Period</th>
+          <th>Expected Rate of Return</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Upto 1 year</td>
+          <td>6%</td>
+        </tr>
+        <tr>
+          <td>1 year to 3 year</td>
+          <td>10%</td>
+        </tr>
+        <tr>
+          <td>More than 3 years</td>
+          <td>14%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="growth-table">
+    <h3>How your Child Education Fund grows if kept at:</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Investment Type</th>
+          <th>Expected Returns</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Savings Account</td>
+          <td>3%</td>
+        </tr>
+        <tr>
+          <td>FD</td>
+          <td>6.91%</td>
+        </tr>
+        <tr class="highlight">
+          <td>LXME's Child Education Plan</td>
+          <td>15.03%*</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="cta-text">
+      Explore LXME's Child Education Plan, a smart and diversified way of
+      investing for securing your child's future!
+    </p>
+    <p class="disclaimer">
+      *The above data is the Last 3 Year CAGR of LXME's Child Education Plan, as
+      of 1st Jan 2025.
+    </p>
+  </div>
+</section>
+
+<script>
+  (function () {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+
+    function init() {
+      const INFLATION = 0.08;
+
+      // Inputs
+      const currentAge = document.getElementById("currentAge");
+      const currentAgeRange = document.getElementById("currentAgeRange");
+      const targetAge = document.getElementById("targetAge");
+      const targetAgeRange = document.getElementById("targetAgeRange");
+      const costToday = document.getElementById("costToday");
+      const costTodayRange = document.getElementById("costTodayRange");
+      const rateReturn = document.getElementById("rateReturn");
+      const rateReturnRange = document.getElementById("rateReturnRange");
+
+      // Outputs
+      const costAtAdmissionEl = document.getElementById("costAtAdmission");
+      const requiredSIPEl = document.getElementById("requiredSIP");
+      const requiredLumpsumEl = document.getElementById("requiredLumpsum");
+      const eduChart = document.getElementById("eduChart");
+
+      // Info buttons
+      document
+        .getElementById("costInfoBtn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document.getElementById("costInfoMessage").classList.toggle("show");
+        });
+
+      document
+        .getElementById("logicInfoBtn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document.getElementById("logicInfoMessage").classList.toggle("show");
+        });
+
+      function formatCurrency(num) {
+        if (isNaN(num) || !isFinite(num)) return "0";
+        return Math.round(num).toLocaleString("en-IN");
+      }
+
+      function autoAdjustRate() {
+        const childAge = parseFloat(currentAge.value) || 1;
+        const admissionAge = parseFloat(targetAge.value) || 18;
+        const timePeriod = admissionAge - childAge;
+
+        let suggestedRate;
+        if (timePeriod <= 1) {
+          suggestedRate = 6;
+        } else if (timePeriod <= 3) {
+          suggestedRate = 10;
+        } else {
+          suggestedRate = 14;
+        }
+
+        rateReturn.value = suggestedRate;
+        rateReturnRange.value = suggestedRate;
+      }
+
+      function updateChart(costNow, costIncrease) {
+        const total = costNow + costIncrease;
+        const yellowPercent = (costNow / total) * 100;
+        const yellowAngle = (yellowPercent / 100) * 360;
+
+        if (eduChart) {
+          eduChart.style.setProperty("--yellow-angle", yellowAngle + "deg");
+        }
       }
 
       function calculate() {
-        const age = parseInt(ageInput.value);
-        const eduAge = parseInt(eduAgeInput.value);
-        const cost = parseFloat(costInput.value);
-        const inflation = parseFloat(inflationInput.value) / 100;
-        const returnRate = parseFloat(returnInput.value) / 100;
-        const savings = parseFloat(savingsInput.value);
+        const childAge = parseFloat(currentAge.value) || 1;
+        const admissionAge = parseFloat(targetAge.value) || 18;
+        const cost = parseFloat(costToday.value) || 2000000;
+        const rate = (parseFloat(rateReturn.value) || 14) / 100;
 
-        const years = eduAge - age;
-        if (years <= 0) return;
+        const timePeriod = admissionAge - childAge;
 
-        const futureCost = cost * Math.pow(1 + inflation, years);
-        const additional = Math.max(futureCost - savings, 0);
+        if (timePeriod <= 0) {
+          costAtAdmissionEl.textContent = formatCurrency(cost);
+          requiredSIPEl.textContent = "₹0";
+          requiredLumpsumEl.textContent = "₹0";
+          updateChart(cost, 0);
+          return;
+        }
 
-        const months = years * 12;
-        const monthlyRate = returnRate / 12;
+        // Cost at admission with inflation
+        const costAtAdmission = cost * Math.pow(1 + INFLATION, timePeriod);
+        const costIncrease = costAtAdmission - cost;
 
-        const sip =
-          (additional * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
+        // SIP (monthly compounding)
+        const monthlyRate = rate / 12;
+        const months = timePeriod * 12;
+        const step1 = 1 + monthlyRate;
+        const step2 = Math.pow(step1, months);
+        const step3 = step2 - 1;
+        const step4 = step3 / monthlyRate;
+        const step5 = step4 * step1;
+        const reqSIP = costAtAdmission / step5;
 
-        document.getElementById("ageVal").innerText = age;
-        document.getElementById("eduAgeVal").innerText = eduAge;
-        document.getElementById("costVal").innerText = "₹ " + format(cost);
-        document.getElementById("inflationVal").innerText =
-          inflationInput.value + "%";
-        document.getElementById("returnVal").innerText =
-          returnInput.value + "%";
-        document.getElementById("savingsVal").innerText =
-          "₹ " + format(savings);
+        // Lumpsum (annual compounding)
+        const reqLumpsum = costAtAdmission / Math.pow(1 + rate, timePeriod);
 
-        document.getElementById("futureCost").innerText =
-          "₹ " + format(Math.round(futureCost));
+        // Update outputs
+        costAtAdmissionEl.textContent = formatCurrency(costAtAdmission);
+        requiredSIPEl.textContent = "₹" + formatCurrency(reqSIP);
+        requiredLumpsumEl.textContent = "₹" + formatCurrency(reqLumpsum);
 
-        document.getElementById("sipDisplay").innerText =
-          "₹ " + format(Math.round(sip));
-
-        document.getElementById("additionalDisplay").innerText =
-          "₹ " + format(Math.round(additional));
-
-        chart.data.datasets[0].data = [savings, additional];
-        chart.update();
+        // Update chart
+        updateChart(cost, costIncrease);
       }
 
-      const ctx = document.getElementById("chart");
-
-      const chart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-          labels: ["Existing Savings", "Additional Required"],
-          datasets: [
-            {
-              data: [200000, 2518000],
-              backgroundColor: ["#e3b23c", "#F30082"],
-            },
-          ],
-        },
-        options: {
-          plugins: { legend: { position: "top" } },
-          cutout: "65%",
-        },
+      // Event listeners
+      currentAgeRange.addEventListener("input", function () {
+        currentAge.value = this.value;
+        autoAdjustRate();
+        calculate();
+      });
+      currentAge.addEventListener("input", function () {
+        currentAgeRange.value = this.value;
+        autoAdjustRate();
+        calculate();
+      });
+      targetAgeRange.addEventListener("input", function () {
+        targetAge.value = this.value;
+        autoAdjustRate();
+        calculate();
+      });
+      targetAge.addEventListener("input", function () {
+        targetAgeRange.value = this.value;
+        autoAdjustRate();
+        calculate();
+      });
+      costTodayRange.addEventListener("input", function () {
+        costToday.value = this.value;
+        calculate();
+      });
+      costToday.addEventListener("input", function () {
+        costTodayRange.value = this.value;
+        calculate();
+      });
+      rateReturnRange.addEventListener("input", function () {
+        rateReturn.value = this.value;
+        calculate();
+      });
+      rateReturn.addEventListener("input", function () {
+        rateReturnRange.value = this.value;
+        calculate();
       });
 
-      [
-        ageInput,
-        eduAgeInput,
-        costInput,
-        inflationInput,
-        returnInput,
-        savingsInput,
-      ].forEach((el) => el.addEventListener("input", calculate));
-
+      // Initial setup
+      autoAdjustRate();
       calculate();
-    </script>
-  </body>
-</html>
+    }
+  })();
+</script>
