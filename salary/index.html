@@ -1,240 +1,1113 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Salary Calculator</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- ============ SALARY CALCULATOR FOR WORDPRESS ============ -->
+<section id="salary-calculator">
+  <div class="salary-card">
+    <!-- LEFT SIDE - INPUTS -->
+    <div class="salary-left">
+      <div class="header">
+        <h2>Salary Calculator</h2>
+        <a
+          href="https://lxme.in/?source_caller=ui&shortlink=mymoneytab04&c=lxme-website&pid=mymoneytab-Salary%20calc-%20website&deep_link_value=mymoneytab&af_xp=custom"
+          class="btn-primary"
+          target="_blank"
+        >
+          Invest Now
+        </a>
+      </div>
 
-    <style>
-      body {
-        font-family: "Segoe UI", sans-serif;
-        background: #f4f4f4;
-        padding: 40px;
-      }
+      <div class="tip-box">
+        💡 Plan your salary wisely with the 50-30-20 budgeting rule!
+      </div>
 
-      .container {
-        max-width: 1100px;
-        margin: auto;
-        background: #fff;
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-      }
-
-      .wrapper {
-        display: flex;
-        gap: 40px;
-        position: relative;
-      }
-
-      .wrapper::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 0;
-        bottom: 0;
-        border-left: 1px solid #e2e2e2;
-      }
-
-      .left,
-      .right {
-        flex: 1;
-        padding: 0 20px;
-      }
-
-      h2 {
-        margin-bottom: 20px;
-      }
-
-      .label {
-        font-weight: 600;
-        margin-top: 25px;
-      }
-
-      .value-box {
-        float: right;
-        background: #f5eef2;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 600;
-        color: #f30082;
-      }
-
-      input[type="range"] {
-        width: 100%;
-        accent-color: #f30082;
-        margin-top: 10px;
-      }
-
-      .summary {
-        text-align: center;
-      }
-
-      .big-amount {
-        font-size: 32px;
-        font-weight: bold;
-        margin: 10px 0 20px;
-      }
-
-      .summary-box {
-        background: #f5f5f5;
-        padding: 15px;
-        border-radius: 10px;
-        margin-top: 15px;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .yellow {
-        color: #e3b23c;
-        font-weight: bold;
-      }
-      .pink {
-        color: #f30082;
-        font-weight: bold;
-      }
-
-      canvas {
-        max-width: 320px;
-        margin: auto;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="wrapper">
-        <div class="left">
-          <h2>Salary Calculator</h2>
-
-          <div class="label">
-            Annual CTC
-            <span class="value-box" id="ctcVal">₹ 8,00,000</span>
+      <!-- CTC Input -->
+      <div class="field">
+        <div class="label-row">
+          <label>Cost to Company (CTC)</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="ctcInput"
+              value="400000"
+              min="100000"
+              max="10000000"
+            />
           </div>
-          <input
-            type="range"
-            id="ctc"
-            min="200000"
-            max="5000000"
-            step="50000"
-            value="800000"
-          />
-
-          <div class="label">
-            Tax (%)
-            <span class="value-box" id="taxVal">10%</span>
-          </div>
-          <input type="range" id="tax" min="0" max="30" value="10" />
-
-          <div class="label">
-            PF (%)
-            <span class="value-box" id="pfVal">12%</span>
-          </div>
-          <input type="range" id="pf" min="0" max="20" value="12" />
-
-          <div class="label">
-            Other Deductions (Yearly)
-            <span class="value-box" id="otherVal">₹ 20,000</span>
-          </div>
-          <input
-            type="range"
-            id="other"
-            min="0"
-            max="200000"
-            step="5000"
-            value="20000"
-          />
         </div>
+        <input
+          type="range"
+          id="ctcRange"
+          min="100000"
+          max="10000000"
+          step="10000"
+          value="400000"
+        />
+        <div class="minmax">
+          <span>₹1,00,000</span>
+          <span>₹1,00,00,000</span>
+        </div>
+      </div>
 
-        <div class="right">
-          <div class="summary">
-            <div>Net Annual Salary</div>
-            <div class="big-amount" id="netAnnual">₹ 5,84,000</div>
+      <!-- Basic Salary -->
+      <div class="field">
+        <div class="label-row">
+          <label>Basic Salary</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="basicInput"
+              value="210000"
+              min="0"
+              max="10000000"
+            />
+          </div>
+        </div>
+        <input
+          type="range"
+          id="basicRange"
+          min="0"
+          max="10000000"
+          step="10000"
+          value="210000"
+        />
+        <div class="minmax">
+          <span>₹0</span>
+          <span>₹1,00,00,000</span>
+        </div>
+      </div>
 
-            <canvas id="chart"></canvas>
+      <!-- Statutory Bonus -->
+      <div class="field">
+        <div class="label-row">
+          <label>Statutory Bonus</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="bonusInput"
+              value="18000"
+              min="0"
+              max="1000000"
+            />
+          </div>
+        </div>
+      </div>
 
-            <div class="summary-box">
-              <span>Net Monthly Salary</span>
-              <span class="yellow" id="netMonthly">₹ 48,667</span>
-            </div>
+      <!-- Special Allowance -->
+      <div class="field">
+        <div class="label-row">
+          <label>Special Allowance</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="specialInput"
+              value="50000"
+              min="0"
+              max="5000000"
+            />
+          </div>
+        </div>
+      </div>
 
-            <div class="summary-box">
-              <span>Total Deductions</span>
-              <span class="pink" id="deductions">₹ 2,16,000</span>
-            </div>
+      <!-- House Rent Allowance -->
+      <div class="field">
+        <div class="label-row">
+          <label>House Rent Allowance (HRA)</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="hraInput"
+              value="100000"
+              min="0"
+              max="5000000"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Travel Allowance -->
+      <div class="field">
+        <div class="label-row">
+          <label>Travel Allowance</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="travelInput"
+              value="0"
+              min="0"
+              max="500000"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Meal/Food Allowance -->
+      <div class="field">
+        <div class="label-row">
+          <label>Meal/Food Allowance</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="mealInput"
+              value="0"
+              min="0"
+              max="500000"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Any Other Allowance -->
+      <div class="field">
+        <div class="label-row">
+          <label>Any Other Allowance</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="otherInput"
+              value="0"
+              min="0"
+              max="1000000"
+            />
+          </div>
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 30px 0" />
+
+      <!-- Deductions Section -->
+      <h3 style="font-size: 18px; color: #333; margin-bottom: 20px">
+        Deductions
+      </h3>
+
+      <!-- Employer PF -->
+      <div class="field">
+        <div class="label-row">
+          <label>
+            Employer's Contribution to PF
+            <button class="info-btn" id="empPFInfoBtn" type="button">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="7"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M8 7V11M8 5V5.5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="empPFInput"
+              value="25200"
+              min="0"
+              max="2500"
+            />
+          </div>
+        </div>
+        <div class="info-message" id="empPFInfoMessage">
+          Auto-filled: 12% of Basic Salary (Max: ₹2,500/month). Editable.
+        </div>
+      </div>
+
+      <!-- Employee PF -->
+      <div class="field">
+        <div class="label-row">
+          <label>Employee's Contribution to PF</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="empePFInput"
+              value="25200"
+              min="0"
+              max="2500"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Professional Tax -->
+      <div class="field">
+        <div class="label-row">
+          <label>
+            Professional Tax
+            <button class="info-btn" id="ptaxInfoBtn" type="button">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="7"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M8 7V11M8 5V5.5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="ptaxInput"
+              value="2400"
+              min="0"
+              max="3000"
+            />
+          </div>
+        </div>
+        <div class="info-message" id="ptaxInfoMessage">
+          Professional tax varies statewise. Max: ₹2,500/year.
+        </div>
+      </div>
+
+      <!-- Employee NPS -->
+      <div class="field">
+        <div class="label-row">
+          <label>Employee's Contribution to NPS</label>
+          <div class="input-box">
+            ₹
+            <input type="number" id="npsInput" value="0" min="0" max="500000" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Insurance -->
+      <div class="field">
+        <div class="label-row">
+          <label>Insurance (If any)</label>
+          <div class="input-box">
+            ₹
+            <input
+              type="number"
+              id="insuranceInput"
+              value="0"
+              min="0"
+              max="100000"
+            />
           </div>
         </div>
       </div>
     </div>
 
-    <script>
-      const ctcInput = document.getElementById("ctc");
-      const taxInput = document.getElementById("tax");
-      const pfInput = document.getElementById("pf");
-      const otherInput = document.getElementById("other");
+    <!-- RIGHT SIDE - OUTPUTS -->
+    <div class="salary-right">
+      <h4>Your Take-Home Salary</h4>
+      <h1>₹ <span id="monthlySalary">0</span><small>/month</small></h1>
+      <p class="annual-salary">₹ <span id="annualSalary">0</span> /year</p>
 
-      function format(num) {
-        return num.toLocaleString("en-IN");
+      <div class="chart-legend">
+        <span><span class="dot yellow"></span> Needs (50%)</span>
+        <span><span class="dot pink"></span> Wants (30%)</span>
+        <span><span class="dot green"></span> Savings (20%)</span>
+      </div>
+
+      <!-- CSS Donut Chart -->
+      <div class="chart-wrapper">
+        <div class="css-donut-chart-3" id="salaryChart">
+          <div class="css-donut-hole"></div>
+        </div>
+      </div>
+
+      <div class="budget-breakdown">
+        <h5>50-30-20 Budget Rule</h5>
+        <div class="budget-item">
+          <span>Needs (50%)</span>
+          <strong class="yellow">₹ <span id="needsAmount">0</span></strong>
+        </div>
+        <div class="budget-item">
+          <span>Wants (30%)</span>
+          <strong class="pink">₹ <span id="wantsAmount">0</span></strong>
+        </div>
+        <div class="budget-item">
+          <span>Savings & Investments (20%)</span>
+          <strong class="green">₹ <span id="savingsAmount">0</span></strong>
+        </div>
+      </div>
+
+      <div class="deduction-summary">
+        <h5>Deduction Summary</h5>
+        <div class="deduction-item">
+          <span>Monthly Deductions</span>
+          <strong>₹ <span id="monthlyDeductions">0</span></strong>
+        </div>
+        <div class="deduction-item">
+          <span>Annual Deductions</span>
+          <strong>₹ <span id="annualDeductions">0</span></strong>
+        </div>
+      </div>
+
+      <a
+        href="https://lxme.in/?source_caller=ui&shortlink=mymoneytab04&c=lxme-website&pid=mymoneytab-Salary%20calc-%20website&deep_link_value=mymoneytab&af_xp=custom"
+        class="btn-primary big"
+        target="_blank"
+      >
+        Start Investing
+      </a>
+    </div>
+  </div>
+
+  <!-- Golden Rule Section -->
+  <div class="golden-rule">
+    <h3>What's the Golden Rule of Budgeting?</h3>
+    <p class="intro">
+      50:30:20 budgeting rule is the golden rule that helps you keep track of
+      your expenses and maintain a budget. It guides you to divide your
+      take-home pay into three categories: needs, wants, and savings &
+      investments.
+    </p>
+
+    <div class="rule-breakdown">
+      <div class="rule-item">
+        <h4>50% for Needs:</h4>
+        <p>
+          Allocate half of your take-home pay to essential expenses like
+          groceries, rent, utilities, transportation, child care, etc.
+        </p>
+      </div>
+      <div class="rule-item">
+        <h4>30% for Wants:</h4>
+        <p>
+          Use 30% of your income for non-essential expenses/luxuries like dining
+          out, vacations, and entertainment.
+        </p>
+      </div>
+      <div class="rule-item">
+        <h4>20% for Savings and Investments:</h4>
+        <p>
+          Save and invest at least 20% of your income for your financial goals.
+        </p>
+      </div>
+    </div>
+
+    <p class="disclaimer">
+      This is a starting point and a thumb rule, you can always customise this
+      as per your financial situation. It ensures you cover necessities, enjoy
+      life, and secure your financial future.
+    </p>
+
+    <p class="highlight">
+      <strong
+        >Remember, to allocate a higher % towards savings and investments as
+        your income increases!</strong
+      >
+    </p>
+  </div>
+
+  <!-- Nudge Message -->
+  <div class="nudge-message">
+    💡 Do not save what is left after spending, but spend what is left after
+    saving
+  </div>
+</section>
+
+<!-- ============ CSS ============ -->
+<style>
+  #salary-calculator * {
+    font-family:
+      Inter,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+    box-sizing: border-box;
+  }
+
+  #salary-calculator {
+    padding: 40px 20px;
+    background: #f9f9f9;
+  }
+
+  .salary-card {
+    max-width: 1200px;
+    margin: auto;
+    background: #fff;
+    border-radius: 24px;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    border: 1px solid #e9e9e9;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .header h2 {
+    margin: 0;
+    font-size: 28px;
+    color: #333;
+  }
+
+  .btn-primary {
+    background: #d63a8d;
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 30px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background: #c02e7a;
+  }
+
+  .tip-box {
+    background: #fff7e6;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  .field {
+    margin-bottom: 24px;
+  }
+
+  .field label {
+    display: block;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .label-row label {
+    margin: 0;
+    flex: 1;
+  }
+
+  .input-box {
+    background: #fff1f7;
+    padding: 6px 14px;
+    border-radius: 8px;
+    color: #d63a8d;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .input-box input {
+    width: 100px;
+    border: none;
+    background: transparent;
+    text-align: right;
+    font-weight: 600;
+    outline: none;
+    color: #d63a8d;
+    font-size: 15px;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    margin-top: 10px;
+    accent-color: #d63a8d;
+    cursor: pointer;
+  }
+
+  .minmax {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-top: 6px;
+    color: #666;
+  }
+
+  /* INFO BUTTON */
+  .info-btn {
+    background: none;
+    border: none;
+    color: #d63a8d;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+  }
+
+  .info-btn:hover {
+    transform: scale(1.1);
+    color: #c02e7a;
+  }
+
+  .info-message {
+    background: #fff7e6;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #f2b705;
+    border: 1px solid #f2c94c;
+    display: none;
+  }
+
+  .info-message.show {
+    display: block;
+  }
+
+  /* RIGHT SIDE */
+  .salary-left {
+    position: relative;
+    padding-right: 40px;
+    max-height: 800px;
+    overflow-y: auto;
+  }
+
+  .salary-left::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -25px;
+    width: 1px;
+    height: 100%;
+    background: #e5e5e5;
+  }
+
+  .salary-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .salary-right h4 {
+    color: #666;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+    font-size: 16px;
+  }
+
+  .salary-right h1 {
+    font-size: 38px;
+    margin: 0;
+    color: #000;
+  }
+
+  .salary-right h1 small {
+    font-size: 18px;
+    color: #666;
+    font-weight: 400;
+  }
+
+  .annual-salary {
+    color: #666;
+    font-size: 14px;
+    margin: 4px 0 24px 0;
+  }
+
+  .chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    flex-wrap: wrap;
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  .dot.yellow {
+    background: #f2c94c;
+  }
+  .dot.pink {
+    background: #d63a8d;
+  }
+  .dot.green {
+    background: #5cb85c;
+  }
+
+  /* CSS DONUT CHART - 3 COLORS */
+  .chart-wrapper {
+    width: 100%;
+    max-width: 280px;
+    margin: 20px auto;
+  }
+
+  .css-donut-chart-3 {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: conic-gradient(
+      #f2c94c 0deg,
+      #f2c94c var(--needs-angle, 180deg),
+      #d63a8d var(--needs-angle, 180deg),
+      #d63a8d var(--wants-end-angle, 288deg),
+      #5cb85c var(--wants-end-angle, 288deg),
+      #5cb85c 360deg
+    );
+    transition: background 0.3s ease;
+  }
+
+  .css-donut-hole {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px;
+    height: 180px;
+    background: white;
+    border-radius: 50%;
+  }
+
+  .budget-breakdown,
+  .deduction-summary {
+    width: 100%;
+    margin-top: 24px;
+  }
+
+  .budget-breakdown h5,
+  .deduction-summary h5 {
+    font-size: 16px;
+    color: #333;
+    margin: 0 0 16px 0;
+    text-align: left;
+  }
+
+  .budget-item,
+  .deduction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f7f7f7;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .budget-item span,
+  .deduction-item span {
+    font-size: 14px;
+    color: #666;
+    text-align: left;
+  }
+
+  .budget-item strong,
+  .deduction-item strong {
+    font-size: 16px;
+  }
+
+  .yellow {
+    color: #f2b705;
+  }
+  .pink {
+    color: #d63a8d;
+  }
+  .green {
+    color: #5cb85c;
+  }
+
+  .big {
+    margin-top: 30px;
+    width: 220px;
+  }
+
+  /* GOLDEN RULE SECTION */
+  .golden-rule {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e9e9e9;
+  }
+
+  .golden-rule h3 {
+    font-size: 26px;
+    color: #333;
+    margin: 0 0 20px 0;
+  }
+
+  .golden-rule .intro {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 24px;
+  }
+
+  .rule-breakdown {
+    margin: 24px 0;
+  }
+
+  .rule-item {
+    margin-bottom: 20px;
+  }
+
+  .rule-item h4 {
+    color: #d63a8d;
+    font-size: 18px;
+    margin: 0 0 8px 0;
+  }
+
+  .rule-item p {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .golden-rule .disclaimer {
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+    margin: 24px 0 16px 0;
+    line-height: 1.6;
+  }
+
+  .golden-rule .highlight {
+    background: #e3f2fd;
+    padding: 16px;
+    border-radius: 10px;
+    color: #1976d2;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .golden-rule .highlight strong {
+    color: #0d47a1;
+  }
+
+  /* NUDGE MESSAGE */
+  .nudge-message {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff7e6 0%, #ffe6f0 100%);
+    border-radius: 16px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    border: 2px solid #f2c94c;
+  }
+
+  /* MOBILE RESPONSIVE */
+  @media (max-width: 768px) {
+    #salary-calculator {
+      padding: 20px 12px;
+    }
+    .salary-card {
+      grid-template-columns: 1fr;
+      padding: 24px 20px;
+      gap: 30px;
+    }
+    .salary-left::after {
+      display: none;
+    }
+    .salary-left {
+      padding-right: 0;
+      max-height: none;
+    }
+    .header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+    .header h2 {
+      font-size: 22px;
+    }
+    .salary-right h1 {
+      font-size: 32px;
+    }
+    .big {
+      width: 100%;
+      max-width: 300px;
+    }
+    .golden-rule {
+      margin: 30px 16px;
+      padding: 24px 16px;
+    }
+    .nudge-message {
+      font-size: 16px;
+      padding: 16px;
+      margin: 20px 16px;
+    }
+  }
+</style>
+
+<!-- ============ JAVASCRIPT ============ -->
+<script>
+  (function () {
+    "use strict";
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+
+    function init() {
+      console.log("Initializing Salary Calculator...");
+
+      // Check if all elements exist
+      const requiredElements = [
+        "ctcInput",
+        "ctcRange",
+        "basicInput",
+        "basicRange",
+        "monthlySalary",
+        "annualSalary",
+        "needsAmount",
+        "wantsAmount",
+        "savingsAmount",
+      ];
+
+      const missing = requiredElements.filter(
+        (id) => !document.getElementById(id),
+      );
+      if (missing.length > 0) {
+        console.error("Missing elements:", missing);
+        return;
       }
 
+      // DOM elements - Inputs
+      const ctcInput = document.getElementById("ctcInput");
+      const ctcRange = document.getElementById("ctcRange");
+      const basicInput = document.getElementById("basicInput");
+      const basicRange = document.getElementById("basicRange");
+      const bonusInput = document.getElementById("bonusInput");
+      const specialInput = document.getElementById("specialInput");
+      const hraInput = document.getElementById("hraInput");
+      const travelInput = document.getElementById("travelInput");
+      const mealInput = document.getElementById("mealInput");
+      const otherInput = document.getElementById("otherInput");
+      const empPFInput = document.getElementById("empPFInput");
+      const empePFInput = document.getElementById("empePFInput");
+      const ptaxInput = document.getElementById("ptaxInput");
+      const npsInput = document.getElementById("npsInput");
+      const insuranceInput = document.getElementById("insuranceInput");
+
+      // DOM elements - Outputs
+      const monthlySalaryEl = document.getElementById("monthlySalary");
+      const annualSalaryEl = document.getElementById("annualSalary");
+      const needsAmountEl = document.getElementById("needsAmount");
+      const wantsAmountEl = document.getElementById("wantsAmount");
+      const savingsAmountEl = document.getElementById("savingsAmount");
+      const monthlyDeductionsEl = document.getElementById("monthlyDeductions");
+      const annualDeductionsEl = document.getElementById("annualDeductions");
+
+      // Info buttons
+      document
+        .getElementById("empPFInfoBtn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document.getElementById("empPFInfoMessage").classList.toggle("show");
+        });
+
+      document
+        .getElementById("ptaxInfoBtn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document.getElementById("ptaxInfoMessage").classList.toggle("show");
+        });
+
+      // Auto-calculate PF when basic salary changes
+      function autoCalculatePF() {
+        if (!basicInput || !empPFInput || !empePFInput) return;
+
+        const basic = parseFloat(basicInput.value) || 0;
+        const monthlyBasic = basic / 12;
+        const maxPF = 2500;
+        const calculatedPF = Math.min(monthlyBasic * 0.12, maxPF);
+        const annualPF = calculatedPF * 12;
+
+        empPFInput.value = Math.round(annualPF);
+        empePFInput.value = Math.round(annualPF);
+
+        console.log("PF Auto-calculated:", annualPF);
+      }
+
+      // Calculate everything
       function calculate() {
-        const ctc = parseFloat(ctcInput.value);
-        const tax = parseFloat(taxInput.value) / 100;
-        const pf = parseFloat(pfInput.value) / 100;
-        const other = parseFloat(otherInput.value);
+        // Get all input values
+        const ctc = parseFloat(ctcInput.value) || 0;
+        const basic = parseFloat(basicInput.value) || 0;
+        const bonus = parseFloat(bonusInput.value) || 0;
+        const special = parseFloat(specialInput.value) || 0;
+        const hra = parseFloat(hraInput.value) || 0;
+        const travel = parseFloat(travelInput.value) || 0;
+        const meal = parseFloat(mealInput.value) || 0;
+        const other = parseFloat(otherInput.value) || 0;
+        const empPF = parseFloat(empPFInput.value) || 0;
+        const empePF = parseFloat(empePFInput.value) || 0;
+        const ptax = parseFloat(ptaxInput.value) || 0;
+        const nps = parseFloat(npsInput.value) || 0;
+        const insurance = parseFloat(insuranceInput.value) || 0;
 
-        const taxAmount = ctc * tax;
-        const pfAmount = ctc * pf;
+        // Calculate total deductions (annual)
+        const totalDeductions = empPF + empePF + ptax + nps + insurance;
+        const monthlyDeductions = totalDeductions / 12;
 
-        const totalDeductions = taxAmount + pfAmount + other;
-        const netAnnual = ctc - totalDeductions;
-        const netMonthly = netAnnual / 12;
+        // Calculate annual salary in hand
+        const annualSalary = ctc - totalDeductions;
+        const monthlySalary = annualSalary / 12;
 
-        document.getElementById("ctcVal").innerText = "₹ " + format(ctc);
+        // Calculate 50-30-20 budget
+        const needs = monthlySalary * 0.5;
+        const wants = monthlySalary * 0.3;
+        const savings = monthlySalary * 0.2;
 
-        document.getElementById("taxVal").innerText = taxInput.value + "%";
+        console.log("Calculating...", {
+          ctc,
+          totalDeductions,
+          annualSalary,
+          monthlySalary,
+          needs,
+          wants,
+          savings,
+        });
 
-        document.getElementById("pfVal").innerText = pfInput.value + "%";
+        // Update DOM
+        if (monthlySalaryEl)
+          monthlySalaryEl.textContent =
+            Math.round(monthlySalary).toLocaleString("en-IN");
+        if (annualSalaryEl)
+          annualSalaryEl.textContent =
+            Math.round(annualSalary).toLocaleString("en-IN");
+        if (needsAmountEl)
+          needsAmountEl.textContent = Math.round(needs).toLocaleString("en-IN");
+        if (wantsAmountEl)
+          wantsAmountEl.textContent = Math.round(wants).toLocaleString("en-IN");
+        if (savingsAmountEl)
+          savingsAmountEl.textContent =
+            Math.round(savings).toLocaleString("en-IN");
+        if (monthlyDeductionsEl)
+          monthlyDeductionsEl.textContent =
+            Math.round(monthlyDeductions).toLocaleString("en-IN");
+        if (annualDeductionsEl)
+          annualDeductionsEl.textContent =
+            Math.round(totalDeductions).toLocaleString("en-IN");
 
-        document.getElementById("otherVal").innerText = "₹ " + format(other);
-
-        document.getElementById("netAnnual").innerText =
-          "₹ " + format(Math.round(netAnnual));
-
-        document.getElementById("netMonthly").innerText =
-          "₹ " + format(Math.round(netMonthly));
-
-        document.getElementById("deductions").innerText =
-          "₹ " + format(Math.round(totalDeductions));
-
-        chart.data.datasets[0].data = [netAnnual, totalDeductions];
-        chart.update();
+        // Update chart
+        updateChart();
       }
 
-      const ctx = document.getElementById("chart");
+      // Update chart (50-30-20 split)
+      function updateChart() {
+        const salaryChart = document.getElementById("salaryChart");
 
-      const chart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-          labels: ["Net Salary", "Total Deductions"],
-          datasets: [
-            {
-              data: [584000, 216000],
-              backgroundColor: ["#e3b23c", "#F30082"],
-            },
-          ],
-        },
-        options: {
-          plugins: { legend: { position: "top" } },
-          cutout: "65%",
-        },
+        if (!salaryChart) return;
+
+        // 50% needs, 30% wants, 20% savings
+        const needsAngle = 180; // 50% of 360deg
+        const wantsEndAngle = 288; // 50% + 30% = 80% of 360deg
+
+        salaryChart.style.setProperty("--needs-angle", needsAngle + "deg");
+        salaryChart.style.setProperty(
+          "--wants-end-angle",
+          wantsEndAngle + "deg",
+        );
+      }
+
+      // Event listeners for CTC
+      if (ctcRange) {
+        ctcRange.addEventListener("input", function () {
+          if (ctcInput) ctcInput.value = this.value;
+          calculate();
+        });
+      }
+
+      if (ctcInput) {
+        ctcInput.addEventListener("input", function () {
+          if (ctcRange) ctcRange.value = this.value;
+          calculate();
+        });
+      }
+
+      // Event listeners for Basic Salary
+      if (basicRange) {
+        basicRange.addEventListener("input", function () {
+          if (basicInput) basicInput.value = this.value;
+          autoCalculatePF();
+          calculate();
+        });
+      }
+
+      if (basicInput) {
+        basicInput.addEventListener("input", function () {
+          if (basicRange) basicRange.value = this.value;
+          autoCalculatePF();
+          calculate();
+        });
+      }
+
+      // All other inputs trigger calculation
+      const allInputs = [
+        bonusInput,
+        specialInput,
+        hraInput,
+        travelInput,
+        mealInput,
+        otherInput,
+        empPFInput,
+        empePFInput,
+        ptaxInput,
+        npsInput,
+        insuranceInput,
+      ];
+
+      allInputs.forEach(function (input) {
+        if (input) {
+          input.addEventListener("input", function () {
+            console.log("Input changed:", input.id, input.value);
+            calculate();
+          });
+        }
       });
 
-      [ctcInput, taxInput, pfInput, otherInput].forEach((el) =>
-        el.addEventListener("input", calculate),
-      );
+      console.log("Salary Calculator initialized");
 
-      calculate();
-    </script>
-  </body>
-</html>
+      // Initial calculation
+      autoCalculatePF();
+      setTimeout(function () {
+        calculate();
+        console.log("Initial calculation complete");
+      }, 100);
+    }
+  })();
+</script>
