@@ -124,6 +124,10 @@
       color: #d63a8d;
       font-size: 15px;
     }
+    .input-box input[readonly] {
+      cursor: default;
+      opacity: 0.85;
+    }
     input[type="range"] {
       width: 100%;
       margin-top: 10px;
@@ -307,6 +311,7 @@
         💡 SSY - Secure your daughter's future with high returns!
       </div>
 
+      <!-- Field 1: Yearly Investment Amount -->
       <div class="field">
         <div class="label-row">
           <label>Yearly Investment Amount</label>
@@ -332,6 +337,7 @@
         <div class="minmax"><span>₹250</span><span>₹1,50,000</span></div>
       </div>
 
+      <!-- Field 2: Rate of Interest -->
       <div class="field">
         <div class="label-row">
           <label>
@@ -373,6 +379,7 @@
         <div class="rate-notice">Fixed for now (Current: 8.2%)</div>
       </div>
 
+      <!-- Field 3: Investment Time Period -->
       <div class="field">
         <div class="label-row">
           <label>Investment Time Period (in years)</label>
@@ -383,6 +390,7 @@
               value="15"
               min="1"
               max="15"
+              readonly
             />
             Years
           </div>
@@ -390,6 +398,45 @@
         <div class="rate-notice">Fixed (Maximum: 15 years for deposits)</div>
       </div>
 
+      <!-- Field 4: Maturity Period (ADDED - was missing) -->
+      <div class="field">
+        <div class="label-row">
+          <label>
+            Maturity Period (in years)
+            <button class="info-btn" id="maturityInfoBtn" type="button">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="7"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M8 7V11M8 5V5.5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </label>
+          <div class="input-box">
+            <input type="number" id="maturityPeriod" value="21" readonly />
+            Years
+          </div>
+        </div>
+        <div class="info-message" id="maturityInfoMessage">
+          SSY account matures 21 years from the date of opening. Deposits are
+          only required for the first 15 years; the corpus continues to earn
+          interest for the remaining 6 years till maturity.
+        </div>
+        <div class="rate-notice">
+          Fixed (SSY matures after 21 years from account opening)
+        </div>
+      </div>
+
+      <!-- Field 5: Start Year -->
       <div class="field">
         <div class="label-row">
           <label>Start Year</label>
@@ -475,6 +522,7 @@
       const yearlyInvestRange = document.getElementById("yearlyInvestRange");
       const rateInterest = document.getElementById("rateInterest");
       const investPeriod = document.getElementById("investPeriod");
+      const maturityPeriodEl = document.getElementById("maturityPeriod"); // ADDED
       const startYear = document.getElementById("startYear");
 
       // Outputs
@@ -487,12 +535,22 @@
       const ctx = document.getElementById("ssyChart");
       let ssyChart = null;
 
-      // Info button
+      // Info button – Rate of Interest
       document
         .getElementById("rateInfoBtn")
         .addEventListener("click", function (e) {
           e.preventDefault();
           document.getElementById("rateInfoMessage").classList.toggle("show");
+        });
+
+      // Info button – Maturity Period (ADDED)
+      document
+        .getElementById("maturityInfoBtn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document
+            .getElementById("maturityInfoMessage")
+            .classList.toggle("show");
         });
 
       function formatCurrency(num) {
@@ -557,32 +615,38 @@
         const yearly = parseFloat(yearlyInvest.value) || 10000;
         const rate = (parseFloat(rateInterest.value) || 8.2) / 100;
         const investYears = parseFloat(investPeriod.value) || 15;
+        const maturityPeriod = parseFloat(maturityPeriodEl.value) || 21; // FIXED: read from UI field
         const start = parseFloat(startYear.value) || 2019;
 
-        // SSY matures after 21 years from opening
-        const maturityPeriod = 21;
+        // Maturity year = start year + 21
         const maturityYr = start + maturityPeriod;
 
-        // Calculate value after investment period (15 years)
-        // Using compound interest formula for yearly deposits
-        const step1 = 1 + rate;
-        const step2 = Math.pow(step1, investYears);
-        const step3 = step2 - 1;
-        const step4 = step3 / rate;
-        const step5 = step4 * step1;
-        const valueAfter15Years = yearly * step5;
+        /*
+         * SSY Calculation Logic (Annuity Due — deposits at START of each year)
+         *
+         * Step 1: FV of annuity due after investYears (15 yrs)
+         *   FV_15 = yearly × [ ((1+r)^n - 1) / r ] × (1+r)
+         *
+         * Step 2: Corpus grows at compound interest for remaining years (21-15 = 6 yrs)
+         *   Maturity = FV_15 × (1+r)^remainingYears
+         *
+         * Verified against spreadsheet:
+         *   yearly=10000, r=8.2%, n=15 → FV_15 = ₹2,98,399 → Maturity = ₹4,78,808 ✅
+         */
+        const step1 = 1 + rate; // 1.082
+        const step2 = Math.pow(step1, investYears); // 1.082^15 = 3.2614
+        const step3 = step2 - 1; // 2.2614
+        const step4 = step3 / rate; // 2.2614 / 0.082 = 27.578
+        const step5 = step4 * step1; // × 1.082 = 29.839  (annuity due)
+        const valueAfter15Years = yearly * step5; // ₹2,98,399
 
-        // Calculate interest earned during investment period
-        const totalInvested = yearly * investYears;
-
-        // After 15 years, no more deposits but continues to earn interest till maturity (21 years)
+        const totalInvested = yearly * investYears; // ₹1,50,000
         const remainingYears = maturityPeriod - investYears; // 6 years
         const maturityAmount =
-          valueAfter15Years * Math.pow(1 + rate, remainingYears);
+          valueAfter15Years * Math.pow(step1, remainingYears); // ₹4,78,808
+        const totalInterest = maturityAmount - totalInvested; // ₹3,28,808
 
-        const totalInterest = maturityAmount - totalInvested;
-
-        // Update outputs
+        // Update output fields
         maturityAmountEl.textContent = formatCurrency(maturityAmount);
         amountInvestedEl.textContent = "₹" + formatCurrency(totalInvested);
         estInterestEl.textContent = "₹" + formatCurrency(totalInterest);
@@ -592,18 +656,20 @@
         updateChart(totalInvested, totalInterest);
       }
 
-      // Event listeners
+      // ── Event Listeners ──────────────────────────────────────────────────
       yearlyInvestRange.addEventListener("input", function () {
         yearlyInvest.value = this.value;
         calculate();
       });
       yearlyInvest.addEventListener("input", function () {
-        yearlyInvestRange.value = this.value;
+        // Keep slider in sync; clamp to slider range
+        const clamped = Math.min(Math.max(this.value, 250), 150000);
+        yearlyInvestRange.value = clamped;
         calculate();
       });
       rateInterest.addEventListener("input", calculate);
-      investPeriod.addEventListener("input", calculate);
       startYear.addEventListener("input", calculate);
+      // investPeriod & maturityPeriod are read-only, no listener needed
 
       // Initial calculation
       calculate();
