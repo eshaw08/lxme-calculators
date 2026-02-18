@@ -166,8 +166,6 @@
       margin: 0 0 24px 0;
       color: #000;
     }
-
-    /* Chart.js Graph Container - Emergency Fund Style */
     .graph-container {
       width: 100%;
       max-width: 100%;
@@ -205,7 +203,6 @@
       max-height: 300px;
       margin-bottom: 20px;
     }
-
     .output-box {
       width: 100%;
       background: #f7f7f7;
@@ -341,11 +338,11 @@
         <div class="label-row">
           <label>What is your current age?</label>
           <div class="input-box">
-            <input type="number" id="currentAge" value="30" min="18" max="70" />
+            <input type="number" id="currentAge" value="25" min="18" max="70" />
             Years
           </div>
         </div>
-        <input type="range" id="currentAgeRange" min="18" max="70" value="30" />
+        <input type="range" id="currentAgeRange" min="18" max="70" value="25" />
         <div class="minmax"><span>18 years</span><span>70 years</span></div>
       </div>
 
@@ -387,7 +384,7 @@
             <input
               type="number"
               id="lifeExpect"
-              value="80"
+              value="75"
               min="50"
               max="100"
             />
@@ -403,7 +400,7 @@
           id="lifeExpectRange"
           min="50"
           max="100"
-          value="80"
+          value="75"
         />
         <div class="minmax"><span>50 years</span><span>100 years</span></div>
       </div>
@@ -418,7 +415,7 @@
             <input
               type="number"
               id="monthlyExp"
-              value="40000"
+              value="50000"
               min="1000"
               max="1000000"
             />
@@ -430,7 +427,7 @@
           min="1000"
           max="1000000"
           step="1000"
-          value="40000"
+          value="50000"
         />
         <div class="minmax"><span>₹1,000</span><span>₹10,00,000</span></div>
       </div>
@@ -621,9 +618,9 @@
     }
 
     function init() {
-      const INFLATION = 0.08; // Fixed 8% inflation
+      const INFLATION = 0.08; // Fixed 8% p.a.
 
-      // Inputs
+      // ── Inputs ─────────────────────────────────────────────────────────────
       const currentAge = document.getElementById("currentAge");
       const currentAgeRange = document.getElementById("currentAgeRange");
       const retireAge = document.getElementById("retireAge");
@@ -638,7 +635,7 @@
       const existingSIP = document.getElementById("existingSIP");
       const existingRate = document.getElementById("existingRate");
 
-      // Outputs
+      // ── Outputs ────────────────────────────────────────────────────────────
       const retireCorpusEl = document.getElementById("retireCorpus");
       const reqSIPEl = document.getElementById("reqSIP");
       const reqLumpEl = document.getElementById("reqLump");
@@ -647,7 +644,7 @@
       const revLumpEl = document.getElementById("revLump");
       const revisedSection = document.getElementById("revisedSection");
 
-      // Chart
+      // ── Chart ──────────────────────────────────────────────────────────────
       const ctx = document.getElementById("calculatorChart");
       let calculatorChart = null;
 
@@ -659,22 +656,14 @@
           document.getElementById("lifeInfoMessage").classList.toggle("show");
         });
 
-      // Currency formatter - digits only, no abbreviations
-      function formatCurrency(num) {
+      function fmt(num) {
         if (isNaN(num) || !isFinite(num)) return "0";
         return Math.round(num).toLocaleString("en-IN");
       }
 
-      function formatCurrencyForChart(num) {
-        return "₹" + Math.round(num).toLocaleString("en-IN");
-      }
-
-      // Update Chart.js graph to match the screenshot UI
+      // ── Bar Chart ──────────────────────────────────────────────────────────
       function updateGraph(expNow, expRetire) {
-        if (calculatorChart) {
-          calculatorChart.destroy();
-        }
-
+        if (calculatorChart) calculatorChart.destroy();
         calculatorChart = new Chart(ctx, {
           type: "bar",
           data: {
@@ -692,67 +681,31 @@
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-              legend: {
-                display: false,
-              },
+              legend: { display: false },
               tooltip: {
-                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                backgroundColor: "rgba(0,0,0,0.8)",
                 padding: 12,
-                titleFont: {
-                  size: 13,
-                },
-                bodyFont: {
-                  size: 14,
-                  weight: "bold",
-                },
                 callbacks: {
-                  label: function (context) {
-                    return formatCurrencyForChart(context.parsed.y);
+                  label: function (ctx) {
+                    return "₹" + fmt(ctx.parsed.y);
                   },
                 },
               },
             },
             scales: {
               x: {
-                grid: {
-                  display: false,
-                  drawBorder: true,
-                  borderColor: "#d0d0d0",
-                  borderWidth: 1,
-                },
-                ticks: {
-                  font: {
-                    size: 12,
-                    family: "Inter, -apple-system, sans-serif",
-                  },
-                  color: "#666",
-                  padding: 8,
-                  maxRotation: 0,
-                  minRotation: 0,
-                },
+                grid: { display: false },
+                ticks: { font: { size: 12 }, color: "#666", maxRotation: 0 },
               },
               y: {
                 beginAtZero: true,
-                border: {
-                  display: true,
-                  color: "#d0d0d0",
-                  width: 1,
-                },
-                grid: {
-                  color: "#e8e8e8",
-                  drawBorder: false,
-                },
+                grid: { color: "#e8e8e8" },
                 ticks: {
-                  callback: function (value) {
-                    if (value === 0) return "₹0";
-                    return "₹" + value.toLocaleString("en-IN");
+                  callback: function (v) {
+                    return v === 0 ? "₹0" : "₹" + v.toLocaleString("en-IN");
                   },
                   color: "#666",
-                  font: {
-                    size: 12,
-                    family: "Inter, -apple-system, sans-serif",
-                  },
-                  padding: 8,
+                  font: { size: 12 },
                 },
               },
             },
@@ -760,146 +713,145 @@
         });
       }
 
-      // Main calculation function based on Excel logic
+      // ── Main Calculation ───────────────────────────────────────────────────
+      /*
+       * VERIFIED FORMULAS (matching spreadsheet exactly):
+       *
+       * Step 1 — Monthly expense at retirement:
+       *   expRetire = expNow × (1 + 0.08)^timeToRetire
+       *
+       * Step 2 — Real rate of return (inflation-adjusted):
+       *   realRate       = (1+rate)/(1+0.08) − 1
+       *   monthlyRealRate = realRate / 12
+       *
+       * Step 3 — Retirement Corpus (PV of annuity):
+       *   corpus = expRetire × [(1 − (1+monthlyRealRate)^−monthsInRetirement) / monthlyRealRate]
+       *   Spreadsheet steps: d24=(b11/12+1), d25=-(life-retire)*12, d26=1-(d24^d25), d27=d26/b11*12, corpus=d27*b14
+       *   ✅ Verified: corpus = ₹7,28,09,239
+       *
+       * Step 4 — Required Monthly SIP (FV annuity due, monthly compounding):
+       *   sipStep1 = 1 + monthlyRate
+       *   sipStep2 = sipStep1^monthsToRetire          ← (1+r)^n
+       *   sipStep3 = sipStep2 − 1
+       *   sipStep4 = sipStep3 / monthlyRate
+       *   sipStep5 = sipStep4 × sipStep1              ← ×(1+r) for annuity due
+       *   reqSIP   = corpus / sipStep5
+       *   ✅ Verified: reqSIP = ₹13,102
+       *
+       * Step 5 — Required Lumpsum (ANNUAL compounding):
+       *   ✅ FIX: reqLump = corpus / (1 + rate)^timeToRetire   ← ANNUAL compounding
+       *   ❌ OLD BUG: reqLump = corpus / sipStep2               ← monthly compounding — WRONG
+       *   ✅ Verified: reqLump = ₹14,29,029
+       *
+       * Existing Investments:
+       *   FV of lumpsum = exLump × (1 + exMonthlyRate)^monthsToRetire  ← monthly compounding
+       *   FV of SIP     = exSIP  × [(1+r)^n−1)/r × (1+r)]             ← monthly annuity due
+       *   Revised corpus = max(0, corpus − totalExFV)
+       *   ✅ Verified: totalExFV = ₹5,32,73,958 → revised corpus = ₹1,95,35,280
+       */
       function calculate() {
-        const age = parseFloat(currentAge.value) || 30;
+        const age = parseFloat(currentAge.value) || 25;
         const retire = parseFloat(retireAge.value) || 55;
-        const life = parseFloat(lifeExpect.value) || 80;
-        const expNow = parseFloat(monthlyExp.value) || 40000;
+        const life = parseFloat(lifeExpect.value) || 75;
+        const expNow = parseFloat(monthlyExp.value) || 50000;
         const rate = (parseFloat(rateReturn.value) || 14) / 100;
 
-        // Calculate time periods
-        const timeToRetire = retire - age; // Years until retirement
-        const yearsInRetire = life - retire; // Years in retirement
-        const monthsInRetire = yearsInRetire * 12;
-        const monthsToRetire = timeToRetire * 12;
+        const timeToRetire = retire - age; // years to retirement
+        const yearsInRetire = life - retire; // years in retirement
+        const monthsInRetire = yearsInRetire * 12; // e.g. 240
+        const monthsToRetire = timeToRetire * 12; // e.g. 360
 
-        // Step 1: Calculate monthly expense at retirement (with inflation)
-        // Formula: expNow * (1 + inflation)^timeToRetire
-        const expRetire = expNow * Math.pow(1 + INFLATION, timeToRetire);
-
-        // Step 2: Calculate real rate of return (adjusting for inflation)
-        // Formula: (1 + rate) / (1 + inflation) - 1
+        const monthlyRate = rate / 12;
         const realRate = (1 + rate) / (1 + INFLATION) - 1;
         const monthlyRealRate = realRate / 12;
 
-        // Step 3: Calculate retirement corpus using PV of annuity formula
-        // Formula: expRetire * [(1 - (1 + r)^-n) / r]
-        // Where r = monthly real rate, n = months in retirement
-        const step1 = 1 + monthlyRealRate;
-        const step2 = Math.pow(step1, -monthsInRetire); // (1+r)^-n
-        const step3 = 1 - step2; // 1 - (1+r)^-n
-        const step4 = step3 / monthlyRealRate; // [1 - (1+r)^-n] / r
-        const corpus = step4 * expRetire;
+        // ── Step 1: Expense at retirement ────────────────────────────────────
+        const expRetire = expNow * Math.pow(1 + INFLATION, timeToRetire);
 
-        // Step 4: Calculate required SIP using FV of annuity formula
-        // Formula: corpus = SIP * [((1+r)^n - 1) / r] * (1+r)
-        const monthlyRate = rate / 12;
-        const sipStep1 = 1 + monthlyRate;
-        const sipStep2 = Math.pow(sipStep1, monthsToRetire); // (1+r)^n
-        const sipStep3 = sipStep2 - 1; // (1+r)^n - 1
-        const sipStep4 = sipStep3 / monthlyRate; // [(1+r)^n - 1] / r
-        const sipStep5 = sipStep4 * sipStep1; // [(1+r)^n - 1] / r * (1+r)
-        const reqSIP = corpus / sipStep5;
+        // ── Step 2: Retirement Corpus (PV of annuity) ────────────────────────
+        const c1 = 1 + monthlyRealRate;
+        const c2 = Math.pow(c1, -monthsInRetire); // (1+r)^-n
+        const c3 = 1 - c2; // 1-(1+r)^-n
+        const c4 = c3 / monthlyRealRate; // [(1-(1+r)^-n)/r]
+        const corpus = c4 * expRetire;
 
-        // Step 5: Calculate required lumpsum (using MONTHLY compounding, same as SIP)
-        // Formula: corpus = lumpsum * (1+monthly_rate)^months
-        const reqLump = corpus / sipStep2;
+        // ── Step 3: Required SIP (monthly annuity due) ───────────────────────
+        const s1 = 1 + monthlyRate;
+        const s2 = Math.pow(s1, monthsToRetire); // (1+r)^n
+        const s3 = s2 - 1;
+        const s4 = s3 / monthlyRate;
+        const s5 = s4 * s1; // ×(1+r) = annuity due
+        const reqSIP = corpus / s5;
 
-        // Update outputs
-        retireCorpusEl.textContent = formatCurrency(corpus);
-        reqSIPEl.textContent = "₹" + formatCurrency(reqSIP);
-        reqLumpEl.textContent = "₹" + formatCurrency(reqLump);
+        // ── Step 4: Required Lumpsum (ANNUAL compounding) ────────────────────
+        // FIX: use annual compounding (1+rate)^years, NOT monthly compounding
+        const reqLump = corpus / Math.pow(1 + rate, timeToRetire);
 
-        // Update chart
+        // ── Update Outputs ────────────────────────────────────────────────────
+        retireCorpusEl.textContent = fmt(corpus);
+        reqSIPEl.textContent = "₹" + fmt(reqSIP);
+        reqLumpEl.textContent = "₹" + fmt(reqLump);
+
+        // ── Chart ─────────────────────────────────────────────────────────────
         updateGraph(expNow, expRetire);
 
-        // Handle existing investments
+        // ── Existing Investments ──────────────────────────────────────────────
         const exLump = parseFloat(existingLump.value) || 0;
         const exSIP = parseFloat(existingSIP.value) || 0;
         const exRate = (parseFloat(existingRate.value) || 12) / 100;
+        const exMRate = exRate / 12;
 
         if (exLump > 0 || exSIP > 0) {
-          // Calculate FV of existing lumpsum (using MONTHLY compounding to match main calculation)
-          const exLumpMonthlyRate = exRate / 12;
-          const exLumpFV =
-            exLump * Math.pow(1 + exLumpMonthlyRate, monthsToRetire);
+          // FV of existing lumpsum — monthly compounding
+          const exLumpFV = exLump * Math.pow(1 + exMRate, monthsToRetire);
 
-          // Calculate FV of existing SIP (using MONTHLY compounding)
-          const exMonthlyRate = exRate / 12;
-          const exStep1 = 1 + exMonthlyRate;
-          const exStep2 = Math.pow(exStep1, monthsToRetire);
-          const exStep3 = exStep2 - 1;
-          const exStep4 = exStep3 / exMonthlyRate;
-          const exStep5 = exStep4 * exStep1;
-          const exSIPFV = exSIP * exStep5;
+          // FV of existing SIP — monthly annuity due
+          const ex1 = 1 + exMRate;
+          const ex2 = Math.pow(ex1, monthsToRetire);
+          const ex3 = ex2 - 1;
+          const ex4 = ex3 / exMRate;
+          const ex5 = ex4 * ex1; // annuity due
+          const exSIPFV = exSIP * ex5;
 
-          // Total FV from existing investments
           const totalExFV = exLumpFV + exSIPFV;
-
-          // Revised corpus required
           const revisedCorpus = Math.max(0, corpus - totalExFV);
 
-          // Revised SIP and Lumpsum (using same formulas as original)
-          const revSIP = revisedCorpus / sipStep5;
-          const revLump = revisedCorpus / sipStep2;
+          // Revised SIP & Lumpsum use same formulas as original
+          const revSIPVal = revisedCorpus / s5;
+          const revLumpVal = revisedCorpus / Math.pow(1 + rate, timeToRetire); // annual compounding
 
-          // Update revised outputs
-          revCorpusEl.textContent = "₹" + formatCurrency(revisedCorpus);
-          revSIPEl.textContent = "₹" + formatCurrency(revSIP);
-          revLumpEl.textContent = "₹" + formatCurrency(revLump);
+          revCorpusEl.textContent = "₹" + fmt(revisedCorpus);
+          revSIPEl.textContent = "₹" + fmt(revSIPVal);
+          revLumpEl.textContent = "₹" + fmt(revLumpVal);
           revisedSection.style.display = "block";
         } else {
           revisedSection.style.display = "none";
         }
       }
 
-      // Event listeners for all inputs
-      currentAgeRange.addEventListener("input", function () {
-        currentAge.value = this.value;
-        calculate();
-      });
-      currentAge.addEventListener("input", function () {
-        currentAgeRange.value = this.value;
-        calculate();
-      });
-      retireAgeRange.addEventListener("input", function () {
-        retireAge.value = this.value;
-        calculate();
-      });
-      retireAge.addEventListener("input", function () {
-        retireAgeRange.value = this.value;
-        calculate();
-      });
-      lifeExpectRange.addEventListener("input", function () {
-        lifeExpect.value = this.value;
-        calculate();
-      });
-      lifeExpect.addEventListener("input", function () {
-        lifeExpectRange.value = this.value;
-        calculate();
-      });
-      monthlyExpRange.addEventListener("input", function () {
-        monthlyExp.value = this.value;
-        calculate();
-      });
-      monthlyExp.addEventListener("input", function () {
-        monthlyExpRange.value = this.value;
-        calculate();
-      });
-      rateReturnRange.addEventListener("input", function () {
-        rateReturn.value = this.value;
-        calculate();
-      });
-      rateReturn.addEventListener("input", function () {
-        rateReturnRange.value = this.value;
-        calculate();
-      });
+      // ── Slider ↔ Input Sync ────────────────────────────────────────────────
+      function syncSlider(rangeEl, inputEl, cb) {
+        rangeEl.addEventListener("input", function () {
+          inputEl.value = this.value;
+          cb();
+        });
+        inputEl.addEventListener("input", function () {
+          rangeEl.value = this.value;
+          cb();
+        });
+      }
+
+      syncSlider(currentAgeRange, currentAge, calculate);
+      syncSlider(retireAgeRange, retireAge, calculate);
+      syncSlider(lifeExpectRange, lifeExpect, calculate);
+      syncSlider(monthlyExpRange, monthlyExp, calculate);
+      syncSlider(rateReturnRange, rateReturn, calculate);
+
       existingLump.addEventListener("input", calculate);
       existingSIP.addEventListener("input", calculate);
       existingRate.addEventListener("input", calculate);
 
-      // Initial calculation
+      // ── Initial Run ────────────────────────────────────────────────────────
       calculate();
     }
   })();

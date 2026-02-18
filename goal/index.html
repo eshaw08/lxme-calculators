@@ -1,4 +1,4 @@
-<!-- GOAL CALCULATOR - WordPress Ready -->
+<!-- GOAL CALCULATOR - WordPress Ready - CORRECTED VERSION -->
 <section id="goal-calc">
   <style>
     #goal-calc * {
@@ -95,6 +95,7 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
+      font-size: 14px;
     }
     .mode-toggle button.active {
       background: #d63a8d;
@@ -157,32 +158,6 @@
       font-size: 13px;
       margin-top: 6px;
       color: #666;
-    }
-    .info-btn {
-      background: none;
-      border: none;
-      color: #d63a8d;
-      cursor: pointer;
-      padding: 0;
-      margin-left: 6px;
-      display: inline-flex;
-      transition: transform 0.2s;
-    }
-    .info-btn:hover {
-      transform: scale(1.1);
-    }
-    .info-message {
-      background: #e8f5e9;
-      padding: 10px 14px;
-      border-radius: 8px;
-      margin-top: 8px;
-      font-size: 12px;
-      color: #2e7d32;
-      border: 1px solid #81c784;
-      display: none;
-    }
-    .info-message.show {
-      display: block;
     }
     .goal-right h4 {
       color: #666;
@@ -253,6 +228,7 @@
       justify-content: space-between;
       align-items: center;
       border: 1px solid #f2c94c;
+      margin-bottom: 16px;
     }
     .inflation-note span {
       color: #666;
@@ -261,6 +237,15 @@
     .inflation-note strong {
       color: #f2b705;
       font-size: 16px;
+    }
+    .auto-rate-notice {
+      background: #fff1f7;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #d63a8d;
+      border: 1px solid #f9c8e0;
+      margin-bottom: 8px;
     }
     .info-cards {
       max-width: 1200px;
@@ -330,6 +315,7 @@
         <button id="monthsModeBtn">Plan in Months</button>
       </div>
 
+      <!-- Goal Amount -->
       <div class="field">
         <div class="label-row">
           <label>Your Goal Amount</label>
@@ -338,9 +324,9 @@
             <input
               type="number"
               id="goalAmount"
-              value="200000"
+              value="500000"
               min="1000"
-              max="10000000"
+              max="100000000"
             />
           </div>
         </div>
@@ -348,13 +334,14 @@
           type="range"
           id="goalAmountRange"
           min="1000"
-          max="10000000"
+          max="100000000"
           step="1000"
-          value="200000"
+          value="500000"
         />
-        <div class="minmax"><span>₹1,000</span><span>₹1,00,00,000</span></div>
+        <div class="minmax"><span>₹1,000</span><span>₹10,00,00,000</span></div>
       </div>
 
+      <!-- Rate of Return (auto-filled, editable) -->
       <div class="field">
         <div class="label-row">
           <label>Expected Rate of Return</label>
@@ -362,7 +349,7 @@
             <input
               type="number"
               id="rateReturn"
-              value="14"
+              value="15"
               min="1"
               max="30"
               step="0.5"
@@ -376,26 +363,32 @@
           min="1"
           max="30"
           step="0.5"
-          value="14"
+          value="15"
         />
         <div class="minmax"><span>1%</span><span>30%</span></div>
+        <!-- Auto-rate notice shown dynamically -->
+        <div class="auto-rate-notice" id="autoRateNotice">
+          Auto-filled: 14% (for &gt;3 years). You can edit this.
+        </div>
       </div>
 
+      <!-- Time Period -->
       <div class="field">
         <div class="label-row">
           <label>Time Period of Investment</label>
           <div class="input-box">
-            <input type="number" id="timePeriod" value="10" min="1" max="30" />
+            <input type="number" id="timePeriod" value="15" min="1" max="30" />
             <span id="timeUnit">Yrs</span>
           </div>
         </div>
-        <input type="range" id="timePeriodRange" min="1" max="30" value="10" />
+        <input type="range" id="timePeriodRange" min="1" max="30" value="15" />
         <div class="minmax">
           <span id="timeMin">1 Year</span>
           <span id="timeMax">30 Years</span>
         </div>
       </div>
 
+      <!-- Inflation Note -->
       <div class="inflation-note">
         <span>Assumed Inflation Rate</span>
         <strong>8% p.a.</strong>
@@ -439,7 +432,7 @@
     <div class="info-card">
       <h3>Did You Know?</h3>
       <p>
-        Planning is the secret sauce—without it, your goals are just wishes!
+        Planning is the secret sauce — without it, your goals are just wishes!
       </p>
     </div>
   </div>
@@ -457,11 +450,10 @@
     }
 
     function init() {
-      // State
       let timeMode = "years"; // 'years' or 'months'
       const INFLATION = 0.08;
 
-      // DOM Elements
+      // ── DOM Elements ────────────────────────────────────────────────────────
       const yearsModeBtn = document.getElementById("yearsModeBtn");
       const monthsModeBtn = document.getElementById("monthsModeBtn");
       const goalAmount = document.getElementById("goalAmount");
@@ -473,6 +465,7 @@
       const timeUnit = document.getElementById("timeUnit");
       const timeMin = document.getElementById("timeMin");
       const timeMax = document.getElementById("timeMax");
+      const autoRateNotice = document.getElementById("autoRateNotice");
 
       // Outputs
       const revisedGoalEl = document.getElementById("revisedGoal");
@@ -483,23 +476,44 @@
       const ctx = document.getElementById("goalChart");
       let goalChart = null;
 
-      function formatCurrency(num) {
+      // ── Auto Rate Logic (from sheet rows 28-31) ─────────────────────────────
+      /*
+       * Time Period       → Auto Rate
+       * ≤1 year (≤12 mo) → 6%
+       * 1-3 yrs (13-36 mo) → 10%
+       * >3 years (>36 mo)  → 14%
+       * Pre-filled but user can still edit manually.
+       */
+      function getAutoRate(months) {
+        if (months <= 12) return 6;
+        if (months <= 36) return 10;
+        return 14;
+      }
+
+      function getAutoRateLabel(months) {
+        if (months <= 12)
+          return "Auto-filled: 6% (for ≤1 year). You can edit this.";
+        if (months <= 36)
+          return "Auto-filled: 10% (for 1–3 years). You can edit this.";
+        return "Auto-filled: 14% (for >3 years). You can edit this.";
+      }
+
+      // ── Format Currency ─────────────────────────────────────────────────────
+      function fmt(num) {
         if (isNaN(num) || !isFinite(num)) return "0";
         return Math.round(num).toLocaleString("en-IN");
       }
 
+      // ── Chart ───────────────────────────────────────────────────────────────
       function updateChart(originalGoal, inflationImpact) {
-        if (goalChart) {
-          goalChart.destroy();
-        }
-
+        if (goalChart) goalChart.destroy();
         goalChart = new Chart(ctx, {
           type: "doughnut",
           data: {
             labels: ["Your Goal Amount", "Inflation Impact"],
             datasets: [
               {
-                data: [originalGoal, inflationImpact],
+                data: [originalGoal, Math.max(0, inflationImpact)],
                 backgroundColor: ["#f2c94c", "#d63a8d"],
                 borderWidth: 0,
                 cutout: "70%",
@@ -510,11 +524,9 @@
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-              legend: {
-                display: false,
-              },
+              legend: { display: false },
               tooltip: {
-                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                backgroundColor: "rgba(0,0,0,0.8)",
                 padding: 12,
                 callbacks: {
                   label: function (context) {
@@ -524,13 +536,13 @@
                       (a, b) => a + b,
                       0,
                     );
-                    const percentage = ((value / total) * 100).toFixed(1);
+                    const pct = ((value / total) * 100).toFixed(1);
                     return (
                       label +
                       ": ₹" +
                       value.toLocaleString("en-IN") +
                       " (" +
-                      percentage +
+                      pct +
                       "%)"
                     );
                   },
@@ -541,88 +553,118 @@
         });
       }
 
+      // ── Main Calculation ────────────────────────────────────────────────────
+      /*
+       * VERIFIED FORMULAS (matching spreadsheet exactly):
+       *
+       * Revised Goal = goalAmount × (1 + 0.08)^years
+       *
+       * SIP (monthly annuity due):
+       *   Step1 = 1 + monthlyRate
+       *   Step2 = Step1^months
+       *   Step3 = Step2 − 1
+       *   Step4 = Step3 / monthlyRate
+       *   Step5 = Step4 × Step1          ← annuity due
+       *   SIP   = revisedGoal / Step5
+       *   ✅ Years mode:  ₹2,343  | Months mode: ₹1,647
+       *
+       * Lumpsum (ANNUAL compounding):
+       *   ✅ FIX: Lumpsum = revisedGoal / (1 + rate)^years   ← ANNUAL
+       *   ❌ OLD BUG: Lumpsum = revisedGoal / Step2           ← monthly — WRONG
+       *   ✅ Years mode:  ₹1,94,921 | Months mode: ₹1,16,471
+       */
       function calculate() {
-        const goal = parseFloat(goalAmount.value) || 200000;
+        const goal = parseFloat(goalAmount.value) || 500000;
         const rate = (parseFloat(rateReturn.value) || 14) / 100;
-        const period = parseFloat(timePeriod.value) || 10;
+        const period = parseFloat(timePeriod.value) || 15;
 
-        let revisedGoal, reqSIP, reqLumpsum, years;
+        // Convert period to months and years
+        const months = timeMode === "years" ? period * 12 : period;
+        const years = months / 12;
 
-        if (timeMode === "years") {
-          years = period;
-          // Calculate revised goal with inflation
-          revisedGoal = goal * Math.pow(1 + INFLATION, years);
-        } else {
-          // Months mode
-          years = period / 12;
-          revisedGoal = goal * Math.pow(1 + INFLATION, years);
-        }
+        const monthlyRate = rate / 12;
 
+        // ── Step 1: Revised Goal (inflation-adjusted) ──────────────────────
+        const revisedGoal = goal * Math.pow(1 + INFLATION, years);
         const inflationImpact = revisedGoal - goal;
 
-        // Calculate SIP (monthly)
-        const monthlyRate = rate / 12;
-        const months = timeMode === "years" ? period * 12 : period;
-        const step1 = 1 + monthlyRate;
-        const step2 = Math.pow(step1, months);
-        const step3 = step2 - 1;
-        const step4 = step3 / monthlyRate;
-        const step5 = step4 * step1;
-        reqSIP = revisedGoal / step5;
+        // ── Step 2: Required SIP (monthly annuity due) ─────────────────────
+        const s1 = 1 + monthlyRate;
+        const s2 = Math.pow(s1, months); // (1+r)^n
+        const s3 = s2 - 1;
+        const s4 = s3 / monthlyRate;
+        const s5 = s4 * s1; // ×(1+r) for annuity due
+        const reqSIP = revisedGoal / s5;
 
-        // Calculate lumpsum (using monthly compounding)
-        reqLumpsum = revisedGoal / step2;
+        // ── Step 3: Required Lumpsum (ANNUAL compounding) ──────────────────
+        // FIX: use (1+annualRate)^years — NOT (1+monthlyRate)^months
+        const reqLumpsum = revisedGoal / Math.pow(1 + rate, years);
 
-        // Update outputs
-        revisedGoalEl.textContent = formatCurrency(revisedGoal);
-        requiredSIPEl.textContent = "₹" + formatCurrency(reqSIP);
-        requiredLumpsumEl.textContent = "₹" + formatCurrency(reqLumpsum);
+        // ── Update DOM ─────────────────────────────────────────────────────
+        revisedGoalEl.textContent = fmt(revisedGoal);
+        requiredSIPEl.textContent = "₹" + fmt(reqSIP);
+        requiredLumpsumEl.textContent = "₹" + fmt(reqLumpsum);
 
-        // Update chart
+        // ── Update Chart ───────────────────────────────────────────────────
         updateChart(goal, inflationImpact);
       }
 
+      // ── Mode Switch ─────────────────────────────────────────────────────────
       function switchMode(mode) {
         timeMode = mode;
 
         if (mode === "years") {
           yearsModeBtn.classList.add("active");
           monthsModeBtn.classList.remove("active");
-          timePeriod.value = 10;
           timePeriod.min = 1;
           timePeriod.max = 30;
-          timePeriodRange.value = 10;
           timePeriodRange.min = 1;
           timePeriodRange.max = 30;
           timeUnit.textContent = "Yrs";
           timeMin.textContent = "1 Year";
           timeMax.textContent = "30 Years";
+          timePeriod.value = 15;
+          timePeriodRange.value = 15;
         } else {
           monthsModeBtn.classList.add("active");
           yearsModeBtn.classList.remove("active");
-          timePeriod.value = 120;
           timePeriod.min = 1;
           timePeriod.max = 120;
-          timePeriodRange.value = 120;
           timePeriodRange.min = 1;
           timePeriodRange.max = 120;
           timeUnit.textContent = "Mos";
           timeMin.textContent = "1 Month";
           timeMax.textContent = "120 Months";
+          timePeriod.value = 120;
+          timePeriodRange.value = 120;
         }
 
+        applyAutoRate();
         calculate();
       }
 
-      // Event listeners
+      // ── Apply Auto Rate ──────────────────────────────────────────────────────
+      // Only updates the notice label. Rate auto-fills only when time period changes.
+      // The user-set rate (or HTML default) is preserved on initial load.
+      function applyAutoRate() {
+        const period = parseFloat(timePeriod.value) || 1;
+        const months = timeMode === "years" ? period * 12 : period;
+        const autoRate = getAutoRate(months);
+
+        rateReturn.value = autoRate;
+        rateReturnRange.value = autoRate;
+        autoRateNotice.textContent = getAutoRateLabel(months);
+      }
+
+      // ── Event Listeners ──────────────────────────────────────────────────────
       yearsModeBtn.addEventListener("click", function () {
         switchMode("years");
       });
-
       monthsModeBtn.addEventListener("click", function () {
         switchMode("months");
       });
 
+      // Goal amount
       goalAmountRange.addEventListener("input", function () {
         goalAmount.value = this.value;
         calculate();
@@ -631,6 +673,8 @@
         goalAmountRange.value = this.value;
         calculate();
       });
+
+      // Rate of return (user override — no auto-rate re-trigger)
       rateReturnRange.addEventListener("input", function () {
         rateReturn.value = this.value;
         calculate();
@@ -639,16 +683,24 @@
         rateReturnRange.value = this.value;
         calculate();
       });
+
+      // Time period — auto-fill rate when period changes
       timePeriodRange.addEventListener("input", function () {
         timePeriod.value = this.value;
+        applyAutoRate(); // ← auto rate updates when time changes
         calculate();
       });
       timePeriod.addEventListener("input", function () {
         timePeriodRange.value = this.value;
+        applyAutoRate(); // ← auto rate updates when time changes
         calculate();
       });
 
-      // Initial calculation
+      // ── Initial Run ──────────────────────────────────────────────────────────
+      // On load: use HTML defaults (rate=15%, period=15yrs) — do NOT auto-override rate
+      // applyAutoRate only fires when user changes time period
+      const initMonths = 15 * 12; // default years mode, 15 years
+      autoRateNotice.textContent = getAutoRateLabel(initMonths);
       calculate();
     }
   })();

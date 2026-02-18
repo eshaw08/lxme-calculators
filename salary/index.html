@@ -27,7 +27,7 @@
             <input
               type="number"
               id="ctcInput"
-              value="400000"
+              value="2000000"
               min="100000"
               max="10000000"
             />
@@ -39,7 +39,7 @@
           min="100000"
           max="10000000"
           step="10000"
-          value="400000"
+          value="2000000"
         />
         <div class="minmax">
           <span>₹1,00,000</span>
@@ -56,7 +56,7 @@
             <input
               type="number"
               id="basicInput"
-              value="210000"
+              value="1200000"
               min="0"
               max="10000000"
             />
@@ -68,7 +68,7 @@
           min="0"
           max="10000000"
           step="10000"
-          value="210000"
+          value="1200000"
         />
         <div class="minmax">
           <span>₹0</span>
@@ -85,7 +85,7 @@
             <input
               type="number"
               id="bonusInput"
-              value="18000"
+              value="240000"
               min="0"
               max="1000000"
             />
@@ -210,35 +210,49 @@
           </label>
           <div class="input-box">
             ₹
-            <input
-              type="number"
-              id="empPFInput"
-              value="25200"
-              min="0"
-              max="2500"
-            />
+            <input type="number" id="empPFInput" value="144000" min="0" />
           </div>
         </div>
         <div class="info-message" id="empPFInfoMessage">
-          Auto-filled: 12% of Basic Salary (Max: ₹2,500/month). Editable.
+          Auto-filled: 12% of Basic Salary (annual). You can edit this manually
+          if needed.
         </div>
+        <div class="rate-notice">Auto-calculated: 12% of Basic Salary</div>
       </div>
 
       <!-- Employee PF -->
       <div class="field">
         <div class="label-row">
-          <label>Employee's Contribution to PF</label>
+          <label>
+            Employee's Contribution to PF
+            <button class="info-btn" id="empePFInfoBtn" type="button">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="7"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M8 7V11M8 5V5.5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </label>
           <div class="input-box">
             ₹
-            <input
-              type="number"
-              id="empePFInput"
-              value="25200"
-              min="0"
-              max="2500"
-            />
+            <input type="number" id="empePFInput" value="144000" min="0" />
           </div>
         </div>
+        <div class="info-message" id="empePFInfoMessage">
+          Auto-filled: 12% of Basic Salary (annual). You can edit this manually
+          if needed.
+        </div>
+        <div class="rate-notice">Auto-calculated: 12% of Basic Salary</div>
       </div>
 
       <!-- Professional Tax -->
@@ -276,7 +290,8 @@
           </div>
         </div>
         <div class="info-message" id="ptaxInfoMessage">
-          Professional tax varies statewise. Max: ₹2,500/year.
+          Professional tax varies statewise. Max ₹2,500/year. Default set to
+          ₹2,400/year.
         </div>
       </div>
 
@@ -486,6 +501,7 @@
     border-radius: 12px;
     margin-bottom: 30px;
     text-align: center;
+    border: 1px solid #f2c94c;
   }
 
   .field {
@@ -524,7 +540,7 @@
   }
 
   .input-box input {
-    width: 100px;
+    width: 110px;
     border: none;
     background: transparent;
     text-align: right;
@@ -583,11 +599,21 @@
     display: block;
   }
 
-  /* RIGHT SIDE */
+  .rate-notice {
+    background: #fff1f7;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #d63a8d;
+    margin-top: 8px;
+    border: 1px solid #f9c8e0;
+  }
+
+  /* LEFT PANEL */
   .salary-left {
     position: relative;
     padding-right: 40px;
-    max-height: 800px;
+    max-height: 900px;
     overflow-y: auto;
   }
 
@@ -601,6 +627,7 @@
     background: #e5e5e5;
   }
 
+  /* RIGHT PANEL */
   .salary-right {
     display: flex;
     flex-direction: column;
@@ -882,30 +909,7 @@
     }
 
     function init() {
-      console.log("Initializing Salary Calculator...");
-
-      // Check if all elements exist
-      const requiredElements = [
-        "ctcInput",
-        "ctcRange",
-        "basicInput",
-        "basicRange",
-        "monthlySalary",
-        "annualSalary",
-        "needsAmount",
-        "wantsAmount",
-        "savingsAmount",
-      ];
-
-      const missing = requiredElements.filter(
-        (id) => !document.getElementById(id),
-      );
-      if (missing.length > 0) {
-        console.error("Missing elements:", missing);
-        return;
-      }
-
-      // DOM elements - Inputs
+      // ── Input Elements ────────────────────────────────────────────────────
       const ctcInput = document.getElementById("ctcInput");
       const ctcRange = document.getElementById("ctcRange");
       const basicInput = document.getElementById("basicInput");
@@ -916,13 +920,13 @@
       const travelInput = document.getElementById("travelInput");
       const mealInput = document.getElementById("mealInput");
       const otherInput = document.getElementById("otherInput");
-      const empPFInput = document.getElementById("empPFInput");
-      const empePFInput = document.getElementById("empePFInput");
+      const empPFInput = document.getElementById("empPFInput"); // Employer PF
+      const empePFInput = document.getElementById("empePFInput"); // Employee PF
       const ptaxInput = document.getElementById("ptaxInput");
       const npsInput = document.getElementById("npsInput");
       const insuranceInput = document.getElementById("insuranceInput");
 
-      // DOM elements - Outputs
+      // ── Output Elements ───────────────────────────────────────────────────
       const monthlySalaryEl = document.getElementById("monthlySalary");
       const annualSalaryEl = document.getElementById("annualSalary");
       const needsAmountEl = document.getElementById("needsAmount");
@@ -931,14 +935,19 @@
       const monthlyDeductionsEl = document.getElementById("monthlyDeductions");
       const annualDeductionsEl = document.getElementById("annualDeductions");
 
-      // Info buttons
+      // ── Info Buttons ──────────────────────────────────────────────────────
       document
         .getElementById("empPFInfoBtn")
         .addEventListener("click", function (e) {
           e.preventDefault();
           document.getElementById("empPFInfoMessage").classList.toggle("show");
         });
-
+      document
+        .getElementById("empePFInfoBtn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document.getElementById("empePFInfoMessage").classList.toggle("show");
+        });
       document
         .getElementById("ptaxInfoBtn")
         .addEventListener("click", function (e) {
@@ -946,26 +955,40 @@
           document.getElementById("ptaxInfoMessage").classList.toggle("show");
         });
 
-      // Auto-calculate PF when basic salary changes
-      function autoCalculatePF() {
-        if (!basicInput || !empPFInput || !empePFInput) return;
-
+      // ── PF Auto-Calculation ───────────────────────────────────────────────
+      // FIX: PF = 12% of Annual Basic Salary (no arbitrary cap)
+      // Both Employer PF and Employee PF auto-fill when basic changes.
+      // User can still override by typing directly in the PF fields.
+      function autoFillPF() {
         const basic = parseFloat(basicInput.value) || 0;
-        const monthlyBasic = basic / 12;
-        const maxPF = 2500;
-        const calculatedPF = Math.min(monthlyBasic * 0.12, maxPF);
-        const annualPF = calculatedPF * 12;
-
-        empPFInput.value = Math.round(annualPF);
-        empePFInput.value = Math.round(annualPF);
-
-        console.log("PF Auto-calculated:", annualPF);
+        const annualPF = Math.round(basic * 0.12); // 12% of annual basic
+        empPFInput.value = annualPF; // Employer PF
+        empePFInput.value = annualPF; // Employee PF
       }
 
-      // Calculate everything
+      // ── Main Calculation ──────────────────────────────────────────────────
+      /*
+       * CORRECT FORMULA (verified against spreadsheet):
+       *
+       * Gross Salary = Basic + Bonus + Special + HRA + Travel + Meal + Other
+       *   (i.e. sum of salary components — does NOT include Employer PF,
+       *    because Employer PF is an additional cost above the salary components)
+       *
+       * Employee Deductions = Employee PF + Professional Tax + NPS + Insurance
+       *   (Employer PF is NOT deducted from take-home — it's already excluded
+       *    from gross because it's outside the salary component sum)
+       *
+       * Annual Take-Home = Gross Salary − Employee Deductions
+       * Monthly Take-Home = Annual Take-Home ÷ 12
+       *
+       * Deduction Summary shows only Employee-side deductions:
+       *   Annual Deductions = Employee PF + PTax + NPS + Insurance
+       *   Monthly Deductions = Annual Deductions ÷ 12
+       *
+       * Verified: CTC=20L, Basic=12L → Monthly=₹1,20,300 ✅ Annual=₹14,43,600 ✅
+       */
       function calculate() {
-        // Get all input values
-        const ctc = parseFloat(ctcInput.value) || 0;
+        // Salary components (gross)
         const basic = parseFloat(basicInput.value) || 0;
         const bonus = parseFloat(bonusInput.value) || 0;
         const special = parseFloat(specialInput.value) || 0;
@@ -973,111 +996,85 @@
         const travel = parseFloat(travelInput.value) || 0;
         const meal = parseFloat(mealInput.value) || 0;
         const other = parseFloat(otherInput.value) || 0;
-        const empPF = parseFloat(empPFInput.value) || 0;
-        const empePF = parseFloat(empePFInput.value) || 0;
+
+        // Gross = sum of all salary components (Employer PF is NOT included here)
+        const grossAnnual =
+          basic + bonus + special + hra + travel + meal + other;
+
+        // Employee-side deductions only (these reduce take-home)
+        const empePF = parseFloat(empePFInput.value) || 0; // Employee PF
         const ptax = parseFloat(ptaxInput.value) || 0;
         const nps = parseFloat(npsInput.value) || 0;
         const insurance = parseFloat(insuranceInput.value) || 0;
 
-        // Calculate total deductions (annual)
-        const totalDeductions = empPF + empePF + ptax + nps + insurance;
-        const monthlyDeductions = totalDeductions / 12;
+        const totalAnnualDeductions = empePF + ptax + nps + insurance;
+        const totalMonthlyDeductions = totalAnnualDeductions / 12;
 
-        // Calculate annual salary in hand
-        const annualSalary = ctc - totalDeductions;
-        const monthlySalary = annualSalary / 12;
+        // Take-home
+        const annualTakeHome = grossAnnual - totalAnnualDeductions;
+        const monthlyTakeHome = annualTakeHome / 12;
 
-        // Calculate 50-30-20 budget
-        const needs = monthlySalary * 0.5;
-        const wants = monthlySalary * 0.3;
-        const savings = monthlySalary * 0.2;
+        // 50-30-20 split (on monthly take-home)
+        const needs = monthlyTakeHome * 0.5;
+        const wants = monthlyTakeHome * 0.3;
+        const savings = monthlyTakeHome * 0.2;
 
-        console.log("Calculating...", {
-          ctc,
-          totalDeductions,
-          annualSalary,
-          monthlySalary,
-          needs,
-          wants,
-          savings,
-        });
+        // ── Update DOM ──────────────────────────────────────────────────────
+        monthlySalaryEl.textContent = fmt(monthlyTakeHome);
+        annualSalaryEl.textContent = fmt(annualTakeHome);
+        needsAmountEl.textContent = fmt(needs);
+        wantsAmountEl.textContent = fmt(wants);
+        savingsAmountEl.textContent = fmt(savings);
+        monthlyDeductionsEl.textContent = fmt(totalMonthlyDeductions);
+        annualDeductionsEl.textContent = fmt(totalAnnualDeductions);
 
-        // Update DOM
-        if (monthlySalaryEl)
-          monthlySalaryEl.textContent =
-            Math.round(monthlySalary).toLocaleString("en-IN");
-        if (annualSalaryEl)
-          annualSalaryEl.textContent =
-            Math.round(annualSalary).toLocaleString("en-IN");
-        if (needsAmountEl)
-          needsAmountEl.textContent = Math.round(needs).toLocaleString("en-IN");
-        if (wantsAmountEl)
-          wantsAmountEl.textContent = Math.round(wants).toLocaleString("en-IN");
-        if (savingsAmountEl)
-          savingsAmountEl.textContent =
-            Math.round(savings).toLocaleString("en-IN");
-        if (monthlyDeductionsEl)
-          monthlyDeductionsEl.textContent =
-            Math.round(monthlyDeductions).toLocaleString("en-IN");
-        if (annualDeductionsEl)
-          annualDeductionsEl.textContent =
-            Math.round(totalDeductions).toLocaleString("en-IN");
-
-        // Update chart
+        // Update donut chart angles (always 50-30-20, fixed ratio)
         updateChart();
       }
 
-      // Update chart (50-30-20 split)
+      // ── Donut Chart ───────────────────────────────────────────────────────
+      // Chart always shows 50-30-20 split (fixed ratio per design)
       function updateChart() {
         const salaryChart = document.getElementById("salaryChart");
-
         if (!salaryChart) return;
-
-        // 50% needs, 30% wants, 20% savings
-        const needsAngle = 180; // 50% of 360deg
-        const wantsEndAngle = 288; // 50% + 30% = 80% of 360deg
-
-        salaryChart.style.setProperty("--needs-angle", needsAngle + "deg");
-        salaryChart.style.setProperty(
-          "--wants-end-angle",
-          wantsEndAngle + "deg",
-        );
+        // 50% Needs = 180deg, 50%+30% Wants end = 288deg
+        salaryChart.style.setProperty("--needs-angle", "180deg");
+        salaryChart.style.setProperty("--wants-end-angle", "288deg");
       }
 
-      // Event listeners for CTC
-      if (ctcRange) {
-        ctcRange.addEventListener("input", function () {
-          if (ctcInput) ctcInput.value = this.value;
-          calculate();
-        });
+      // ── Utility ───────────────────────────────────────────────────────────
+      function fmt(num) {
+        if (isNaN(num) || !isFinite(num)) return "0";
+        return Math.round(num).toLocaleString("en-IN");
       }
 
-      if (ctcInput) {
-        ctcInput.addEventListener("input", function () {
-          if (ctcRange) ctcRange.value = this.value;
-          calculate();
-        });
-      }
+      // ── Event Listeners ───────────────────────────────────────────────────
 
-      // Event listeners for Basic Salary
-      if (basicRange) {
-        basicRange.addEventListener("input", function () {
-          if (basicInput) basicInput.value = this.value;
-          autoCalculatePF();
-          calculate();
-        });
-      }
+      // CTC slider ↔ input sync
+      ctcRange.addEventListener("input", function () {
+        ctcInput.value = this.value;
+        calculate();
+      });
+      ctcInput.addEventListener("input", function () {
+        ctcRange.value = this.value;
+        calculate();
+      });
 
-      if (basicInput) {
-        basicInput.addEventListener("input", function () {
-          if (basicRange) basicRange.value = this.value;
-          autoCalculatePF();
-          calculate();
-        });
-      }
+      // Basic salary slider ↔ input sync + auto-fill PF
+      basicRange.addEventListener("input", function () {
+        basicInput.value = this.value;
+        autoFillPF(); // ← auto-recalculate both PF fields
+        calculate();
+      });
+      basicInput.addEventListener("input", function () {
+        basicRange.value = this.value;
+        autoFillPF(); // ← auto-recalculate both PF fields
+        calculate();
+      });
 
-      // All other inputs trigger calculation
-      const allInputs = [
+      // All other inputs — just recalculate
+      // (PF inputs are editable overrides, so they just trigger calculate)
+      [
         bonusInput,
         specialInput,
         hraInput,
@@ -1085,29 +1082,17 @@
         mealInput,
         otherInput,
         empPFInput,
-        empePFInput,
+        empePFInput, // user can override auto-filled PF
         ptaxInput,
         npsInput,
         insuranceInput,
-      ];
-
-      allInputs.forEach(function (input) {
-        if (input) {
-          input.addEventListener("input", function () {
-            console.log("Input changed:", input.id, input.value);
-            calculate();
-          });
-        }
+      ].forEach(function (el) {
+        if (el) el.addEventListener("input", calculate);
       });
 
-      console.log("Salary Calculator initialized");
-
-      // Initial calculation
-      autoCalculatePF();
-      setTimeout(function () {
-        calculate();
-        console.log("Initial calculation complete");
-      }, 100);
+      // ── Initial Run ───────────────────────────────────────────────────────
+      autoFillPF();
+      calculate();
     }
   })();
 </script>
